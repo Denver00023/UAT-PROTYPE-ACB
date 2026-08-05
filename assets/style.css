@@ -1,0 +1,292 @@
+/* ============================ GLOBAL ============================ */
+
+body {
+    background-color: #F8F5F2;
+}
+
+div[data-testid="stMain"] {
+    background: linear-gradient(180deg, #f7f4ef 0%, #f1ede8 100%);
+}
+
+div[data-testid="stMain"] .block-container {
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid rgba(56, 81, 68, 0.10);
+    border-radius: 22px;
+    padding: 1.35rem 1.5rem 1.8rem 1.5rem;
+    box-shadow: 0 12px 30px rgba(26, 39, 30, 0.06);
+    backdrop-filter: blur(2px);
+}
+
+/* Reduce overall font size slightly */
+html, body {
+    font-size: 14px !important;
+}
+
+/* Compact sidebar spacing */
+section[data-testid="stSidebar"] {
+    padding-top: 0.5rem !important;
+}
+
+section[data-testid="stSidebar"] .block-container {
+    padding-top: 0.4rem !important;
+    padding-left: 0.7rem !important;
+    padding-right: 0.7rem !important;
+}
+
+/* Compact sidebar expander spacing */
+section[data-testid="stSidebar"] details {
+    margin-bottom: 6px !important;
+}
+
+/* Compact buttons */
+.stButton > button {
+    height: 46px !important;
+    font-size: 15px !important;
+    border-radius: 14px !important;
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+}
+
+
+
+
+/* ============================ SIDEBAR ============================ */
+
+section[data-testid="stSidebar"] {
+    background-color: #385144;
+}
+
+section[data-testid="stSidebar"] * {
+    color: #F8F5F2 !important;
+}
+
+section[data-testid="stSidebar"] p,
+section[data-testid="stSidebar"] span,
+section[data-testid="stSidebar"] label {
+    color: #F8F5F2 !important;
+}
+
+section[data-testid="stSidebar"] details {
+    background: rgba(255,255,255,.08);
+    border-radius: 14px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    border: none;
+}
+
+section[data-testid="stSidebar"] summary {
+    padding: 11px 12px !important;
+    font-size: 14px;
+    font-weight: 700;
+    color: white !important;
+}
+
+section[data-testid="stSidebar"] summary:hover {
+    background: #5f8377 !important;
+}
+
+section[data-testid="stSidebar"] details[open] summary {
+    background: linear-gradient(
+        90deg,
+        #5f8377,
+        #385144
+    ) !important;
+}
+
+/* remove default border */
+section[data-testid="stSidebar"] details div[role="group"] {
+    border-top: none !important;
+}
+
+/* ============================ HEADER ============================ */
+
+.hero-card {
+    background: linear-gradient(135deg, #385144, #243128);
+    color: white;
+    padding: 24px;
+    border-radius: 20px;
+    margin-bottom: 18px;
+    box-shadow: 0 14px 32px rgba(22, 34, 26, 0.18);
+}
+
+.hero-title {
+    font-size: 42px;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 8px;
+}
+
+.hero-subtitle {
+    color: #dce6df;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.hero-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.summary-card {
+    background: white;
+    border: 1px solid rgba(56, 81, 68, 0.12);
+    border-radius: 18px;
+    padding: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,.05);
+}
+
+.summary-label {
+    color: #6b7280;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+}
+
+.summary-value {
+    color: #385144;
+    font-size: 22px;
+    font-weight: 800;
+}
+
+/* ============================ DASHBOARD HOME PANEL ============================ */
+
+.dashboard-panel {
+    background: white;
+    border: 1px solid rgba(56, 81, 68, 0.12);
+    border-radius: 18px;
+    padding: 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 10px 24px rgba(0,0,0,.05);
+}
+
+.panel-title {
+    color: #385144;
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+
+.panel-subtitle {
+    color: #6b7280;
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+.pill-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.status-pill {
+    background: #e9f1ec;
+    color: #385144;
+    border-radius: 999px;
+    padding: 7px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+}
+
+/* ============================ MODULE BANNER ============================ */
+
+.module-banner {
+    background: linear-gradient(135deg, #385144, #243128);
+    color: white;
+    padding: 18px 20px;
+    border-radius: 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 12px 28px rgba(22, 34, 26, 0.16);
+}
+
+.module-title {
+    font-size: 28px;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 4px;
+}
+
+.module-subtitle {
+    color: #dce6df;
+    font-size: 14px;
+}
+
+/* ============================ DASHBOARD CARD ============================ */
+
+.card {
+    background: #333c43;
+    color: white;
+    padding: 14px;
+    border-radius: 14px;
+    border-left: 6px solid #385144;
+    box-shadow: 0 6px 18px rgba(0,0,0,.06);
+}
+
+div[data-testid="stMetric"] {
+    background: white;
+    border: 1px solid rgba(56, 81, 68, 0.12);
+    border-radius: 16px;
+    padding: 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,.05);
+}
+
+/* ============================ BUTTONS ============================ */
+
+.stButton > button{
+
+    width:260px;
+    height:60px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    text-align:center;
+
+    font-size:20px;
+    font-weight:700;
+
+    color:white;
+
+    border:none;
+    border-radius:18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #385144,
+            #2D4036,
+            #333c43
+        );
+
+    box-shadow:
+        0 10px 25px rgba(0,0,0,.15);
+
+    transition:.25s;
+}
+
+.stButton > button:hover{
+
+    transform:translateY(-5px);
+
+    background:
+        linear-gradient(
+            135deg,
+            #4b6a60,
+            #5f8377
+        );
+
+    box-shadow:
+        0 15px 35px rgba(0,0,0,.25);
+}
+
+/* ============================ COLUMNS ============================ */
+
+div[data-testid="column"]{
+
+    display:flex;
+    justify-content:center;
+}
