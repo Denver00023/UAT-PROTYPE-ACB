@@ -7,31 +7,39 @@ from datetime import datetime
 from utils.theme import load_css
 
 from modules import (
-    #candata,
-    apc,
+
+    #AMAZON MODULES
     amazon_xml,
     amazon_aci_json,
     #amazon_xml_gets,
+
+    #APC MODULES
+    apc,
     apc_billing,
     apc_billing_header_report,
     apc_client_details,
-    #aci_json,
-    defender,
-    #Item_report,
-    spliptpdf,
-    #analytics_dashboard,
     apc_pallet_id,
-    #airshipment,
-    #prohibited,
+
+    #DATA PROCESSING MODULES
+    candata,
+    aci_json,
+    airshipment,
+    prohibited,
+
+    #UTILITY MODULES
+    defender,
+    ezclear,
+    spliptpdf,
+    compresspdf,
+
+    #OTHER MODULES
     #test_sharepoint,
     #excelmerger,
     #gst,
     #candata_to_gets_format,
-    compresspdf,
     #bandofcanada,
     #amazon_xml_old,
     #vendor,
-    
 )
 
 
@@ -85,7 +93,7 @@ NAV_GROUPS = {
         "🛡️ DEFENDER": "DEFENDER",
         "📑 Split PDF": "SPLIT_PDF",
         "📦 Compress PDF": "compresspdf",
-        "📊 EZCLEAR": "Item_report",
+        "📊 EZCLEAR": "ezclear",
     }
 }
 
@@ -111,32 +119,34 @@ for group_name, items in NAV_GROUPS.items():
                 st.rerun()
 
 MODULES = {
-    
+
+    #AMAZON MODULES
     "AMAZON_XML": amazon_xml.run,
     "AMAZON_ACI_JSON": amazon_aci_json.run,
     #"AMAZON_XML_GETS": amazon_xml_gets.run,
 
-    #"CANDATA": candata.run,
-    #"ACI_JSON": aci_json.run,
-    #"AIRSHIPMENT": airshipment.run,
+    #DATA PROCESSING MODULES
+    "CANDATA": candata.run,
+    "ACI_JSON": aci_json.run,
+    "AIRSHIPMENT": airshipment.run,
+    "PROHIBITED": prohibited.run,
 
+    #APC MODULES
     "APC": apc.run,
     "APC_BILLING": apc_billing.run,
     "APC_CLIENT_DETAILS": apc_client_details.run,
     "APC_BILLING_HEADER": apc_billing_header_report.run,
     "APC_PALLET_ID": apc_pallet_id.run,
 
+    #UTILITY MODULES
     "DEFENDER": defender.run,
     "SPLIT_PDF": spliptpdf.run,
-    #"Item_report": Item_report.run,
-    #"DASHBOARD": analytics_dashboard.run,
-    #"PROHIBITED": prohibited.run,
-    #"test_sharepoint": test_sharepoint.run,
+    "ezclear": ezclear.run,
+    "compresspdf": compresspdf.run,
 
     #"excelmerger": excelmerger.run,
     #"gst": gst.run,
     #"candata_to_gets_format": candata_to_gets_format.run,
-    "compresspdf": compresspdf.run,
 }
 
 # ---------------- HOME PAGE ----------------

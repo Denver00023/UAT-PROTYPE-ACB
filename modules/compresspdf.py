@@ -228,9 +228,7 @@ def create_zip(files):
 
 def run():
 
-    st.title(
-        "PDF Compressor and Outlook Splitter"
-    )
+    st.subheader("PDF Compressor and Outlook Splitter")
 
     uploaded = st.file_uploader(
         "Upload PDF",
