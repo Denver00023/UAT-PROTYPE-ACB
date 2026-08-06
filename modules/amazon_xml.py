@@ -187,12 +187,15 @@ def build_row(header, item, mapping_dict, hs_mapping, mawb_number):
         "Manifest Only": "",
         "Movement Type": "",
         "TARIFF_TREATMENT_CODE": "2",
-        "External Reference 2": header.get("PONumber", ""),
+        "External Reference 2":re.sub(r"-\d{3}$","",str(header.get("invoiceTitle", "")).strip()), 
         "GST CODE": "",
         "UOM_Quantity": "",
         "Converted_Quantity": "",
-        "Container": re.sub(r"-\d{3}$","",str(header.get("invoiceTitle", "")).strip()),
-    }
+        "Container": header.get("PONumber", ""), 
+        
+        #"Container": re.sub(r"-\d{3}$","",str(header.get("invoiceTitle", "")).strip()),
+        #"External Reference 2": header.get("PONumber", ""), 
+    } 
 
 # CREATE EXCEL
 def create_excel(df):
@@ -490,19 +493,20 @@ def run():
 
 
         if uom == "DZN":
-            return round(qty / 12, 3)
+            return round(qty / 12, 2)
 
         elif uom == "GRO":
-            return round(qty / 144, 3)
+            return round(qty / 144, 2)
 
         elif uom == "GRM":
-            return round(weight * 1000, 3)
+            return round(weight * 1000, 2)
 
         elif uom == "KGM":
-            return round(weight * 0.453592, 3)
+            return round(weight * 0.453592, 2)
 
         elif uom == "TNE":
-            return round((weight * 0.453592) / 1000, 4)
+            #return round((weight * 0.453592) / 1000, 6)
+            return max(round((weight * 0.453592) / 1000,2), 0.01)
 
         elif uom in [
             "MIL",
