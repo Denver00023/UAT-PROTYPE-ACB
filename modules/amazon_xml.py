@@ -68,7 +68,7 @@ def extract_items(root):
     return items
 
 # BUILD CANADA ROW
-def build_row(header, item, mapping_dict, hs_mapping, mawb_number):
+def build_row(header, item, mapping_dict, hs_mapping, mawb_number, program_scope):
 
     seller = header.get("seller", {})
     receiver = header.get("receiver", {})
@@ -192,7 +192,9 @@ def build_row(header, item, mapping_dict, hs_mapping, mawb_number):
         "UOM_Quantity": "",
         "Converted_Quantity": "",
         "Container": header.get("PONumber", ""), 
-        
+
+        "_program_scope": program_scope,
+
         #"Container": re.sub(r"-\d{3}$","",str(header.get("invoiceTitle", "")).strip()),
         #"External Reference 2": header.get("PONumber", ""), 
     } 
@@ -413,8 +415,8 @@ def run():
 
                 for item in items:
 
-                    row = build_row(header, item, mapping_dict, hs_mapping, mawb_number)
-                    row["_program_scope"] = program_scope
+                    row = build_row(header, item, mapping_dict, hs_mapping, mawb_number, program_scope)
+                    #row["_program_scope"] = program_scope
                     all_rows.append(row)
 
                 status.write(f"Completed: {uploaded_file.name}")
@@ -595,11 +597,18 @@ def run():
 
     df['Total_value_of_parcel'] = df.groupby('Reliable_tracking')['Total_value_of_item'].transform('sum').round(2)
 
-    preview_df = df.drop(columns=["_program_scope"], errors="ignore")
+    preview_df = df.copy()
 
     st.dataframe(preview_df, use_container_width=True)
 
-    df = df.drop(columns=["_program_scope"])
+    # Rename for final output (recommended)
+    df = df.rename(columns={"_program_scope": "Program_Scope"})
+
+    #preview_df = df.drop(columns=["_program_scope"], errors="ignore")
+
+    #st.dataframe(preview_df, use_container_width=True)
+
+    #df = df.drop(columns=["_program_scope"])
 
     excel_data = create_excel(df)
 

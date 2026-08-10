@@ -5,7 +5,6 @@ from datetime import datetime
 
 
 # BASE HEADERS
-
 BASE_HEADERS = [
     "Inco_term",
     "Mode_of_transport",
@@ -91,6 +90,7 @@ IMPORTER_RULES = {
         "Importer_party_id": "APCB2B02"
     }
 }
+
 # CLIENT CONFIG
 CLIENT_CONFIG = {
 
@@ -175,11 +175,9 @@ CLIENT_CONFIG = {
             }
         },
 
-
 }
 
 # REQUIRED COLUMNS
-
 REQUIRED_COLUMNS = [
     "Reliable_tracking",
     "IID_Y/N",
@@ -189,7 +187,6 @@ REQUIRED_COLUMNS = [
 
 
 # UTILITIES
-
 def clean_columns(df):
 
     df.columns = (
@@ -238,9 +235,9 @@ def validate_data(df, client_type):
     audit_rows = []
 
     # COUNTRY OF ORIGIN VALIDATION
-    if client_type in ["REGULAR AMAZON", "AMAZON CALGARY"]:
+    if client_type in ["PGA", "B2B", "LVS"]:
 
-        restricted_origins = {"US", "RU", "BY", "KP"}
+        restricted_origins = {"RU", "BY", "KP"}
 
         for index, row in df.iterrows():
 
@@ -416,7 +413,6 @@ def process_data(
                 )
 
             # APPLY OVERRIDES
-
             override_value = overrides.get(
                 final_col,
                 ""
@@ -467,7 +463,6 @@ def process_data(
                     value = "U" + pickup_state
 
             # GST CODE RULES
-
             if final_col == "GST CODE":
 
                 seller_name = str(
@@ -492,7 +487,6 @@ def process_data(
                 ):
                     value = "065"
 
-
                 # APC POSTAL + APC C/O CANADA POST
                 elif (
                     "APC POSTAL" in seller_name
@@ -501,7 +495,6 @@ def process_data(
                 ):
                     value = "065"
 
-
                 # APC POSTAL + RELIABLE LOGISTICS
                 elif (
                     "APC POSTAL" in seller_name
@@ -509,7 +502,6 @@ def process_data(
                     "RELIABLE LOGISTICS" in buyer_name
                 ):
                     value = "001"
-
 
                 # SECRET LAIR SELLER + Reliable Logistics BUYER
                 elif (
@@ -548,7 +540,6 @@ def process_data(
         output_rows.append(mapped_row)
     
     # FINAL DATAFRAME
-    
     final_df = pd.DataFrame(output_rows)
 
     final_df = final_df.reindex(
@@ -556,7 +547,6 @@ def process_data(
     )
     
     # EXCEL FORMULA PROTECTION
-    
     final_df = final_df.map(
         protect_excel_formula
     )
@@ -605,37 +595,31 @@ def run():
     with col1:
 
         mawb_input = st.text_input(
-            "MAWB # (optional)",
+            "**MAWB # (optional)**",
             placeholder="123-45678901"
         )
 
-        external_ref_input = st.text_input(
-            "External Reference 2 (optional)",
+        carrier_code_input = st.text_input(
+            "**Carrier Code (optional COLUMN BI)**",
             placeholder="0000"
         )
 
     with col2:
         port_of_discharge_input = st.text_input(
-            "Port of Discharge (optional COLUMN BC)",
+            "**Port of Discharge (optional COLUMN BC)**",
             placeholder="0000"
         )
 
         port_input = st.text_input(
-            "Port Sublocation Code (optional COLUMN BD)",
+            "**Port Sublocation Code (optional COLUMN BD)**",
             placeholder="0000"
         )
 
-    carrier_code_input = st.text_input(
-        "Carrier Code (optional COLUMN BI)",
-        placeholder="0000"
-        )
-    
     st.caption("“Note: Filling in these fields is optional. If you prefer not to use them, simply leave them blank. However, if you do provide values, they will be included in the final output of the Excel download file.”")
     
     # FILE UPLOAD
-    
     client_file = st.file_uploader(
-        "Upload Client File",
+        "**Upload Client File**",
         type=["xlsx", "xls"]
     )
     
@@ -709,9 +693,6 @@ def run():
                     "Port_of_Discharge":
                         port_of_discharge_input.strip(),
 
-                    "External Reference 2":
-                        external_ref_input.strip(),
-
                     "Carrier code":
                         carrier_code_input.strip()
                 }
@@ -754,10 +735,18 @@ def run():
                     final_headers=final_headers,
                     overrides=overrides
                 )
-                
+
+                unique_tracking = final_df["Reliable_tracking"].nunique()
+
+                duplicate_tracking = (
+                    final_df["Reliable_tracking"]
+                    .value_counts()
+                    .gt(1)
+                    .sum()
+                )
+
                 # METRICS
-                
-                col1, col2 = st.columns(2)
+                col1, col2, col3, col4 = st.columns(4)
 
                 with col1:
 
@@ -767,34 +756,43 @@ def run():
                     )
 
                 with col2:
+                    st.metric(
+                        "Duplicate Reliable Tracking",
+                        duplicate_tracking
+                    )
+
+                with col3:    
+                    st.metric(
+                        "Unique Reliable Tracking",
+                        unique_tracking
+                    )
+
+                with col4:
 
                     st.metric(
                         "Validation Errors",
                         0
                     )
+
                 
                 # SUCCESS
-                
                 st.success(
                     f"✅ Successfully processed "
                     f"{len(final_df)} rows"
                 )
                 
                 # DISPLAY DATA
-                
                 st.dataframe(
                     final_df,
                     use_container_width=True
                 )
                 
                 # EXPORT EXCEL
-                
                 output = generate_excel(
                     final_df
                 )
                 
                 # SAFE FILENAME
-                
                 safe_mawb = (
                     mawb_input.strip()
                     or "NO_MAWB"
@@ -812,7 +810,6 @@ def run():
                 )
                 
                 # DOWNLOAD BUTTON
-                
                 st.download_button(
                     label="📥 Download Result",
                     data=output.getvalue(),
