@@ -458,9 +458,13 @@ def process_data(
                     )
                 ).strip().upper()
 
-                if origin == "US":
+                if origin in ["CA", "US"]:
 
                     value = "U" + pickup_state
+
+                else:
+                    
+                    value = row.get("Country_of_origin", "")
 
             # GST CODE RULES
             if final_col == "GST CODE":
