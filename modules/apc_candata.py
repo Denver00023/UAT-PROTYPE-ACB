@@ -151,6 +151,7 @@ CLIENT_CONFIG = {
     "LVS": {
 
             "filter_iid": "N",
+            "filter_category": "LVS",
 
             "extra_headers": [
                 
@@ -383,6 +384,19 @@ def process_data(
             .str.strip()
             .str.upper()
             == filter_iid
+        ]
+
+    # FILTER CATEGORY
+    filter_category = config.get("filter_category")
+
+    if filter_category:
+
+        df = df[
+            df["Category"]
+            .astype(str)
+            .str.strip()
+            .str.upper()
+            == filter_category.upper()
         ]
     
     # PROCESS ROWS
