@@ -80,6 +80,10 @@ IMPORTER_RULES = {
         "Importer_party_id": "APCCHRI01",
         "AutoCalc_Provincial_Rate": "C"
     },
+    "789682689RM0002": {
+        "Importer_party_id": "APCGREL01",
+        "AutoCalc_Provincial_Rate": "P"
+    },
     "874616311RM0001": {
         "Importer_party_id": "APCB2B01"
     },
