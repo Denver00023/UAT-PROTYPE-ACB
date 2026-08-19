@@ -172,7 +172,7 @@ CLIENT_CONFIG = {
                 "Importer_party_id": "FBGYYZ01",
                 "AutoCalc_Provincial_Rate": "P",
                 "Port_of_Discharge_Sublocation Code": "",
-    
+                "PGA Flag": "HC",
             },
     
             "importer_rules": {
@@ -456,6 +456,10 @@ def process_data(
 
                 if origin == "US":
                     value = "10"
+
+                elif origin == "CA":
+                    value = "10"
+                    
                 else:
                     value = ""
 
