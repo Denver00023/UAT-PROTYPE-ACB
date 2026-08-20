@@ -52,6 +52,7 @@ def extract_items(root):
         items.append({
             "asin": item.findtext("asin", ""),
             "itemID": item.findtext("itemID", ""),
+            
             "hs_code": item.findtext("destinationHTSCode", "").replace(".", ""),
             "description": item.findtext("harmonizedTariffDescription", ""),
             "country": item.findtext("countryOfOrigin", ""),
@@ -62,7 +63,8 @@ def extract_items(root):
             "weight_uom": weight_node.attrib.get("unitOfMeasure", "") if weight_node is not None else "",
             "unit_price": money_node.text if money_node is not None else "",
             "currency": money_node.attrib.get("currencyISOCode", "") if money_node is not None else "",
-            "total_value": item.findtext(".//totalUnitValue/monetaryAmount", "")
+            "total_value": item.findtext(".//totalUnitValue/monetaryAmount", ""),
+            
         })
 
     return items
@@ -149,6 +151,7 @@ def build_row(header, item, mapping_dict, hs_mapping, mawb_number, program_scope
         
         # ---------------- PRODUCT ----------------
         "Product_code": item.get("asin", ""),
+        "AMAZON_FNSKU": item.get("itemID", ""),
         "Currency_code": item.get("currency", ""),
         "Package_no": item.get("quantity", ""),
         "Quantity": item.get("quantity", ""),
