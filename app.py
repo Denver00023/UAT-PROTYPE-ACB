@@ -101,9 +101,13 @@ NAV_GROUPS = {
     }
 }
 
-
-st.sidebar.title("☰ MENU")
-st.sidebar.caption("NAVIGATION")
+st.sidebar.markdown(
+    '''
+    <div class="sidebar-menu-title"> ☰ MENU</div>
+    <div class="sidebar-menu-caption">NAVIGATION</div>
+    ''',
+    unsafe_allow_html=True
+)
 
 for group_name, items in NAV_GROUPS.items():
 

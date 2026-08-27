@@ -1105,3 +1105,56 @@ div[data-testid="stRadio"] [data-baseweb="radio"][aria-checked="true"] > div {
     background-color: #EF4F25 !important;
 }
 
+/* HEADER */
+.main-header {
+    font-size: 42px;
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 6px;
+    color: #0E3A5E;
+    letter-spacing: -0.02em;
+}
+
+.main-header::first-line {
+    color: #EF4F25;
+}
+
+.sub-header {
+    color: #526579;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+/* SIDEBAR HEADER */
+section[data-testid="stSidebar"] h1 {
+    color: #FFFFFF !important;
+    font-size: 24px !important;
+    font-weight: 800 !important;
+    margin-bottom: 0 !important;
+}
+
+section[data-testid="stSidebar"] .stCaption {
+    color: #AFC4D1 !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.12em;
+}
+
+/* SIDEBAR MENU */
+.sidebar-menu-title {
+    color: #FFFFFF;
+    font-size: 25px;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 4px;
+}
+
+.sidebar-menu-caption {
+    color: #1C9FD8;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    margin-bottom: 18px;
+}
