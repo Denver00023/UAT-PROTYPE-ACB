@@ -1158,3 +1158,73 @@ section[data-testid="stSidebar"] .stCaption {
     letter-spacing: 0.14em;
     margin-bottom: 18px;
 }
+
+/* DOWNLOAD BUTTONS */
+div[data-testid="stDownloadButton"] > button {
+    width: 260px !important;
+    min-height: 60px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    text-align: center !important;
+
+    padding: 10px 18px !important;
+
+    font-size: 16px !important;
+    font-weight: 700 !important;
+
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
+
+    background: linear-gradient(
+        135deg,
+        #0E3A5E 0%,
+        #125174 55%,
+        #1C9FD8 130%
+    ) !important;
+
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    border-radius: 14px !important;
+
+    box-shadow:
+        0 8px 20px rgba(14,58,94,0.18) !important;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease !important;
+}
+
+div[data-testid="stDownloadButton"] > button:hover {
+    transform: translateY(-3px);
+
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
+
+    background: linear-gradient(
+        135deg,
+        #EF4F25 0%,
+        #D94720 45%,
+        #0E3A5E 130%
+    ) !important;
+
+    box-shadow:
+        0 12px 28px rgba(14,58,94,0.28) !important;
+}
+
+div[data-testid="stDownloadButton"] > button:active {
+    transform: translateY(-1px);
+}
+
+div[data-testid="stDownloadButton"] > button:focus {
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
+
+    border-color: #1C9FD8 !important;
+
+    box-shadow:
+        0 0 0 3px rgba(28,159,216,0.20),
+        0 8px 20px rgba(14,58,94,0.18) !important;
+}
