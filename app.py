@@ -48,7 +48,7 @@ from modules import (
 # --------PAGE CONFIG----------
 
 st.set_page_config(
-    page_title="ACB Enterprise Portal",
+    page_title="UAT ABS Enterprise Portal",
     page_icon="assets/qwe1.ico",
     layout="wide",
     initial_sidebar_state="expanded"
