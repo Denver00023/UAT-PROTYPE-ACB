@@ -131,10 +131,43 @@ section[data-testid="stSidebar"] {
     padding-top: 0.5rem !important;
 }
 
+/* SIDEBAR CONTENT */
 section[data-testid="stSidebar"] .block-container {
-    padding-top: 0.4rem !important;
-    padding-left: 0.7rem !important;
-    padding-right: 0.7rem !important;
+    padding-top: 0.8rem !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+}
+
+/* SIDEBAR TEXT */
+section[data-testid="stSidebar"] p,
+section[data-testid="stSidebar"] span,
+section[data-testid="stSidebar"] label {
+    font-size: 15px !important;
+}
+
+/* SIDEBAR MENU TITLE */
+.sidebar-menu-title {
+    font-size: 28px !important;
+}
+
+/* SIDEBAR MENU CAPTION */
+.sidebar-menu-caption {
+    font-size: 12px !important;
+}
+
+/* SIDEBAR EXPANDER */
+section[data-testid="stSidebar"] summary {
+    padding: 14px 15px !important;
+    font-size: 15px !important;
+}
+
+/* SLIGHTLY SMALLER BUTTONS */
+.stButton > button {
+    width: 250px !important;
+    min-height: 48px !important;
+    font-size: 15px !important;
+    border-radius: 12px !important;
+    padding: 8px 14px !important;
 }
 
 
@@ -1227,4 +1260,14 @@ div[data-testid="stDownloadButton"] > button:focus {
     box-shadow:
         0 0 0 3px rgba(28,159,216,0.20),
         0 8px 20px rgba(14,58,94,0.18) !important;
+}
+
+/* SIDEBAR WIDTH */
+section[data-testid="stSidebar"] {
+    width: 320px !important;
+    min-width: 320px !important;
+}
+
+section[data-testid="stSidebar"] > div {
+    width: 320px !important;
 }
