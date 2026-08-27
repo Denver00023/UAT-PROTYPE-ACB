@@ -32,6 +32,7 @@ from modules import (
     ezclear,
     spliptpdf,
     compresspdf,
+    hr_payroll,
 
     #OTHER MODULES  
     #test_sharepoint,
@@ -96,6 +97,7 @@ NAV_GROUPS = {
         "📑 Split PDF": "SPLIT_PDF",
         "📦 Compress PDF": "compresspdf",
         "📊 EZCLEAR": "ezclear",
+        "💰 HR PAYROLL": "hr_payroll",
     }
 }
 
@@ -146,6 +148,7 @@ MODULES = {
     "SPLIT_PDF": spliptpdf.run,
     "ezclear": ezclear.run,
     "compresspdf": compresspdf.run,
+    "hr_payroll": hr_payroll.run,
 
     #"excelmerger": excelmerger.run,
     #"gst": gst.run,

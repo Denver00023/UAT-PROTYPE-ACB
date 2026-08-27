@@ -3,6 +3,7 @@ import pandas as pd
 import xml.etree.ElementTree as ET
 from io import BytesIO
 import re
+import zipfile
 
 # XML HEADER EXTRACTOR
 def normalize_name(name):
@@ -208,16 +209,170 @@ def create_excel(df):
     output = BytesIO()
 
     with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
-        df.to_excel(writer, sheet_name="CANDATA_AMAZON_B2B", index=False)
+        df.to_excel(
+            writer,
+            sheet_name="CANDATA_AMAZON_B2B",
+            index=False
+        )
+
         worksheet = writer.sheets["CANDATA_AMAZON_B2B"]
 
         for i, col in enumerate(df.columns):
-            max_len = max(df[col].astype(str).map(len).max(), len(col))
+            max_len = max(
+                df[col].astype(str).map(len).max(),
+                len(col)
+            )
             worksheet.set_column(i, i, max_len + 5)
 
     output.seek(0)
     return output
 
+
+# CREATE AIOR / SIOR EXCEL
+def create_aior_sior_excel(df):
+
+    output = BytesIO()
+
+    # Filter using Program_Scope
+    sior_df = df[
+        df["Program_Scope"]
+        .astype(str)
+        .str.upper()
+        .str.contains("S-IOR", na=False)
+    ].copy()
+
+    aior_df = df[
+        df["Program_Scope"]
+        .astype(str)
+        .str.upper()
+        .str.contains("A-IOR", na=False)
+    ].copy()
+
+    with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
+
+        # ---------------- SIOR ----------------
+        sior_df.to_excel(
+            writer,
+            sheet_name="SIOR",
+            index=False
+        )
+
+        sior_worksheet = writer.sheets["SIOR"]
+
+        for i, col in enumerate(sior_df.columns):
+            max_len = max(
+                sior_df[col].astype(str).map(len).max()
+                if not sior_df.empty else 0,
+                len(col)
+            )
+            sior_worksheet.set_column(i, i, max_len + 5)
+
+        # ---------------- AIOR ----------------
+        aior_df.to_excel(
+            writer,
+            sheet_name="AIOR",
+            index=False
+        )
+
+        aior_worksheet = writer.sheets["AIOR"]
+
+        for i, col in enumerate(aior_df.columns):
+            max_len = max(
+                aior_df[col].astype(str).map(len).max()
+                if not aior_df.empty else 0,
+                len(col)
+            )
+            aior_worksheet.set_column(i, i, max_len + 5)
+
+    output.seek(0)
+
+    return output
+
+# CREATE SELLER FILES ZIP
+def create_seller_files_zip(df):
+
+    zip_output = BytesIO()
+
+    # Remove blank Seller_name
+    seller_df = df[
+        df["Seller_name"].astype(str).str.strip() != ""
+    ].copy()
+
+    with zipfile.ZipFile(
+        zip_output,
+        mode="w",
+        compression=zipfile.ZIP_DEFLATED
+    ) as zip_file:
+
+        # Group data by Seller_name
+        for seller_name, seller_data in seller_df.groupby(
+            "Seller_name",
+            sort=True
+        ):
+
+            seller_name = str(seller_name).strip()
+
+            # Clean invalid characters for Windows filenames
+            safe_filename = re.sub(
+                r'[<>:"/\\|?*]',
+                "_",
+                seller_name
+            )
+
+            # Prevent extremely long filenames
+            safe_filename = safe_filename[:150].strip()
+
+            if not safe_filename:
+                safe_filename = "Unknown_Seller"
+
+            # Create Excel file in memory
+            seller_output = BytesIO()
+
+            with pd.ExcelWriter(
+                seller_output,
+                engine="xlsxwriter"
+            ) as writer:
+
+                seller_data.to_excel(
+                    writer,
+                    sheet_name="CANDATA",
+                    index=False
+                )
+
+                worksheet = writer.sheets["CANDATA"]
+
+                # Adjust column widths
+                for i, col in enumerate(seller_data.columns):
+
+                    if seller_data.empty:
+                        max_len = len(col)
+
+                    else:
+                        max_len = max(
+                            seller_data[col]
+                            .astype(str)
+                            .map(len)
+                            .max(),
+                            len(col)
+                        )
+
+                    worksheet.set_column(
+                        i,
+                        i,
+                        max_len + 5
+                    )
+
+            seller_output.seek(0)
+
+            # Add Excel file to ZIP
+            zip_file.writestr(
+                f"{safe_filename}.xlsx",
+                seller_output.getvalue()
+            )
+
+    zip_output.seek(0)
+
+    return zip_output
 
 def extract_bol_mapping(root):
     """
@@ -615,12 +770,56 @@ def run():
 
     excel_data = create_excel(df)
 
-    st.download_button(
-        label="⬇ **Download Canada Upload File**",
-        data=excel_data,
-        file_name=f"AMAZON_B2B_CANDATA_UPLOAD_{pd.Timestamp.now().strftime('%Y%m%d%H%M%S')}.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
+    aior_sior_excel = create_aior_sior_excel(df)
+
+    seller_files_zip = create_seller_files_zip(df)
+
+    col1, col2, col3 = st.columns(3)
+
+    # FULL CANDATA
+    with col1:
+
+        st.download_button(
+            label="⬇ **Download Canada Upload File**",
+            data=excel_data,
+            file_name=(
+                f"AMAZON_B2B_CANDATA_UPLOAD_"
+                f"{pd.Timestamp.now().strftime('%Y%m%d%H%M%S')}.xlsx"
+            ),
+            mime=(
+                "application/vnd.openxmlformats-officedocument."
+                "spreadsheetml.sheet"
+            )
+        )
+
+    # AIOR / SIOR
+    with col2:
+
+        st.download_button(
+            label="⬇ **Download AIOR / SIOR Files**",
+            data=aior_sior_excel,
+            file_name=(
+                f"AMAZON_B2B_AIORSIOR_"
+                f"{pd.Timestamp.now().strftime('%Y%m%d%H%M%S')}.xlsx"
+            ),
+            mime=(
+                "application/vnd.openxmlformats-officedocument."
+                "spreadsheetml.sheet"
+            )
+        )
+
+    # SELLER FILES
+    with col3:
+
+        st.download_button(
+            label="⬇ **Download Seller Files**",
+            data=seller_files_zip,
+            file_name=(
+                f"AMAZON_B2B_SELLER_FILES_"
+                f"{pd.Timestamp.now().strftime('%Y%m%d%H%M%S')}.zip"
+            ),
+            mime="application/zip"
+        )
 
 # ENTRY
 if __name__ == "__main__":
