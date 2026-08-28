@@ -191,16 +191,16 @@ def build_row(header, item, mapping_dict, hs_mapping, mawb_number, program_scope
         "Manifest Only": "",
         "Movement Type": "",
         "TARIFF_TREATMENT_CODE": "2",
-        "External Reference 2":re.sub(r"-\d{3}$","",str(header.get("invoiceTitle", "")).strip()), 
+        "External Reference 2":re.sub(r"-\d{3}$","",str(header.get("invoiceTitle", "")).strip()), # New updated logic to use invoiceTitle
         "GST CODE": "",
-        "UOM_Quantity": "",
-        "Converted_Quantity": "",
-        "Container": header.get("PONumber", ""), 
+        "UOM_Quantity": "", # New column for UOM based on HS code mapping
+        "Converted_Quantity": "", # New column for converted quantity based on UOM
+        "Container": header.get("PONumber", ""),  # New updated logic to use container as TrackingID
 
-        "_program_scope": program_scope,
+        "_program_scope": program_scope, #identify S-IOR & A-IOR for summary metrics
 
-        #"Container": re.sub(r"-\d{3}$","",str(header.get("invoiceTitle", "")).strip()),
-        #"External Reference 2": header.get("PONumber", ""), 
+        #"Container": re.sub(r"-\d{3}$","",str(header.get("invoiceTitle", "")).strip()), #Original logic, but changed to POnumber for better accuracy
+        #"External Reference 2": header.get("PONumber", ""), #Original logic, but changed to invoiceTitle for better accuracy
     } 
 
 # CREATE EXCEL
@@ -799,7 +799,7 @@ def run():
             label="⬇ **Download AIOR / SIOR Files**",
             data=aior_sior_excel,
             file_name=(
-                f"AMAZON_B2B_AIORSIOR_"
+                f"AMAZON_B2B_AIOR&SIOR_"
                 f"{pd.Timestamp.now().strftime('%Y%m%d%H%M%S')}.xlsx"
             ),
             mime=(
