@@ -32,7 +32,7 @@ def run():
 
     with col1:
         gets_file = st.file_uploader(
-            "Upload GETS Upload File",
+            "**Upload GETS Upload File**",
             type=["xlsx", "csv"]
         )
         client_value = st.text_input("CLIENT", placeholder="Client Name")
@@ -40,7 +40,7 @@ def run():
 
     with col2:
         sftp_file = st.file_uploader(
-            "Upload SFTP File",
+            "**Upload SFTP File**",
             type=["xlsx", "csv"]
         )
         rpt_date_value = st.text_input("RPT DATE", value=pd.Timestamp.now().strftime("%m/%d/%Y"))

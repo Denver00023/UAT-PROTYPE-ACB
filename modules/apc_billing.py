@@ -53,13 +53,13 @@ def run():
     col1, col2 = st.columns(2)
 
     with col1:
-        candata_file = st.file_uploader("Upload CANDATA File", type=["xlsx", "csv"])
+        candata_file = st.file_uploader("**Upload CANDATA File**", type=["xlsx", "csv"])
 
     with col2:
-        sftp_file = st.file_uploader("Upload SFTP File", type=["xlsx", "csv"])
+        sftp_file = st.file_uploader("**Upload SFTP File**", type=["xlsx", "csv"])
 
     mawb_input = st.text_input(
-        "MAWB #",
+        "**MAWB #**",
         placeholder="123-45678901"
         )
     st.caption("Note: Please enter MAWB before uploading files. These will be used in the output filename.")

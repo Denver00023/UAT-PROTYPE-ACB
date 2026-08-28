@@ -28,9 +28,9 @@ def run():
     col1, col2 = st.columns(2)
 
     with col1:
-        scrub_file = st.file_uploader("📄 Upload Scrubbing File", type=["xlsx"])
+        scrub_file = st.file_uploader("**📄 Upload Scrubbing File**", type=["xlsx"])
     with col2:
-        sftp_file = st.file_uploader("📄 Upload Original SFTP File", type=["xlsx"])
+        sftp_file = st.file_uploader("**📄 Upload Original SFTP File**", type=["xlsx"])
 
     st.markdown("---")
     st.caption("© 2026 ACB Toolkit | Developed by IT Department")

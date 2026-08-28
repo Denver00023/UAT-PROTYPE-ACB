@@ -10,8 +10,8 @@ def run():
     st.subheader("📊 HS Code Validator")
 
     # Upload files
-    client_file = st.file_uploader("Upload Client File", type=["xlsx", "xls", "csv"])
-    master_file = st.file_uploader("Upload Master File", type=["xlsx", "xls", "csv"])
+    client_file = st.file_uploader("**Upload Client File**", type=["xlsx", "xls", "csv"])
+    master_file = st.file_uploader("**Upload Master File**", type=["xlsx", "xls", "csv"])
 
     st.markdown("---")
     st.caption("© 2026 ACB Toolkit | Developed by IT Department")

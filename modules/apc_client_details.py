@@ -53,10 +53,10 @@ def run():
     col1, col2 = st.columns(2)
 
     with col1:
-        candata_file = st.file_uploader("Upload CANDATA File", type=["xlsx", "csv"])
+        candata_file = st.file_uploader("**Upload CANDATA File**", type=["xlsx", "csv"])
 
     with col2:
-        client_file = st.file_uploader("Upload CLIENT File", type=["xlsx", "csv"])
+        client_file = st.file_uploader("**Upload CLIENT File**", type=["xlsx", "csv"])
 
     st.markdown("---")
     st.caption("© 2026 ACB Toolkit | Developed by IT Department")

@@ -713,8 +713,7 @@ div[data-testid="stDateInput"] input::placeholder {
     opacity: 1 !important;
 }
 
-div[data-testid="stTextInput"] label,
-div[data-testid="stTextArea"] label,
+
 div[data-testid="stNumberInput"] label,
 div[data-testid="stDateInput"] label {
     color: #0E3A5E !important;
@@ -762,6 +761,24 @@ div[data-testid="stNumberInput"] input:disabled {
     background-color: #F1F5F8 !important;
 }
 
+div[data-testid="stTextInput"] label:hover,
+div[data-testid="stNumberInput"] label:hover,
+div[data-testid="stTextArea"] label:hover,
+div[data-testid="stDateInput"] label:hover,
+div[data-testid="stFileUploader"] label:hover {
+    background: linear-gradient(
+        135deg,
+        #EF4F25 0%,
+        #D94720 45%,
+        #0E3A5E 100%
+    );
+
+    -webkit-background-clip: text;
+    background-clip: text;
+
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
 
 /* CHECKBOX-RADIO */
 

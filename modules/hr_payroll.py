@@ -494,7 +494,7 @@ def run():
     # UPLOAD
 
     uploaded_file = st.file_uploader(
-        "Upload Excel DTR",
+        "**Upload Excel DTR**",
         type=["xlsx", "xls"]
     )
 

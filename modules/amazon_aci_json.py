@@ -52,7 +52,7 @@ def run():
         "NU": "Nunavut", "YT": "Yukon"
     }
 
-    uploaded_file = st.file_uploader("Upload Excel or CSV File", type=["xlsx", "xls", "csv"])
+    uploaded_file = st.file_uploader("**Upload Excel or CSV File**", type=["xlsx", "xls", "csv"])
 
     from datetime import datetime
     from zoneinfo import ZoneInfo
@@ -63,7 +63,7 @@ def run():
     default_arrival = est_now.strftime("%Y-%m-%d %H:%M:%S")
 
     arrival_datetime = st.text_input(
-    "Estimated Arrival Date/Time (YY-MM-DD HH:MM:SS)",
+    "**Estimated Arrival Date/Time (YY-MM-DD HH:MM:SS)**",
     value=default_arrival
     )
 

@@ -443,12 +443,12 @@ def run():
     col1, col2 = st.columns(2)
 
     with col1:
-        st.session_state.cbsa_port = st.text_input("CBSA Port of Release", "0440")
-        st.session_state.cbsa_wh = st.text_input("CBSA Warehouse Sub Location Code", "")
+        st.session_state.cbsa_port = st.text_input("**CBSA Port of Release**", "0440")
+        st.session_state.cbsa_wh = st.text_input("**CBSA Warehouse Sub Location Code**", "")
 
     with col2:
-        st.session_state.cbsa_discharge = st.text_input("Port of Discharge", "")
-        st.session_state.cbsa_subloc = st.text_input("Port of Discharge Sublocation Code", "")
+        st.session_state.cbsa_discharge = st.text_input("**Port of Discharge**", "")
+        st.session_state.cbsa_subloc = st.text_input("**Port of Discharge Sublocation Code**", "")
 
     st.markdown("---")
     st.caption("© 2026 ACB Toolkit | Developed by IT Department")

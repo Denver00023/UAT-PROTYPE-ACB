@@ -33,7 +33,7 @@ def run():
         "NU": "Nunavut", "YT": "Yukon"
     }
 
-    uploaded_file = st.file_uploader("Upload Excel or CSV File", type=["xlsx", "xls", "csv"])
+    uploaded_file = st.file_uploader("**Upload Excel or CSV File**", type=["xlsx", "xls", "csv"])
 
     st.markdown("---")
     st.caption("© 2026 ACB Toolkit | Developed by IT Department")

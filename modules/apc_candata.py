@@ -609,7 +609,7 @@ def run():
     # CLIENT TYPE
     
     client_type = st.radio(
-        "Select Client Template",
+        "**Select Client Template**",
         list(CLIENT_CONFIG.keys()),
         horizontal=True
     )

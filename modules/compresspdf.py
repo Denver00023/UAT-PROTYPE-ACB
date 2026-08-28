@@ -231,12 +231,12 @@ def run():
     st.subheader("PDF Compressor and Outlook Splitter")
 
     uploaded = st.file_uploader(
-        "Upload PDF",
+        "**Upload PDF**",
         type=["pdf"]
     )
 
     quality = st.selectbox(
-        "Compression quality",
+        "**Compression quality**",
         [
             "high",
             "medium",

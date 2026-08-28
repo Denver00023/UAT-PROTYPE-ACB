@@ -18,20 +18,20 @@ def run():
 
     with col1:
         # Upload file
-        uploaded_file = st.file_uploader("Upload Excel File", type=["xlsx", "xls"])
+        uploaded_file = st.file_uploader("**Upload Excel File**", type=["xlsx", "xls"])
 
     with col2:
         search_mode = st.radio(
-        "Search Mode",
+        "**Search Mode**",
         ["Exact Match", "Partial Match"],
         horizontal=True
         )
 
-        expand = st.checkbox("Expand Input Box")
+        expand = st.checkbox("**Expand Input Box**")
 
     # APC input
     apc_input = st.text_area(
-        "Paste APC Tracking IDs (one per line)",
+        "**Paste APC Tracking IDs (one per line)**",
         height=400 if expand else 150,
         placeholder="APC17008P061521631860\nAPC17008P061521632085"
     )

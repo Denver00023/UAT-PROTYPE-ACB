@@ -517,7 +517,7 @@ def run():
     # CLIENT TYPE
     
     client_type = st.radio(
-        "Select Client Template",
+        "**Select Client Template**",
         list(CLIENT_CONFIG.keys()),
         horizontal=True
     )
@@ -529,28 +529,28 @@ def run():
     with col1:
 
         mawb_input = st.text_input(
-            "MAWB # (optional)",
+            "**MAWB # (optional)**",
             placeholder="123-45678901"
         )
 
         external_ref_input = st.text_input(
-            "External Reference 2 (optional)",
+            "**External Reference 2 (optional)**",
             placeholder="0000"
         )
 
     with col2:
         port_of_discharge_input = st.text_input(
-            "Port of Discharge (optional COLUMN BC)",
+            "**Port of Discharge (optional COLUMN BC)**",
             placeholder="0000"
         )
 
         port_input = st.text_input(
-            "Port Sublocation Code (optional COLUMN BD)",
+            "**Port Sublocation Code (optional COLUMN BD)**",
             placeholder="0000"
         )
 
     carrier_code_input = st.text_input(
-        "Carrier Code (optional COLUMN BI)",
+        "**Carrier Code (optional COLUMN BI)**",
         placeholder="0000"
         )
     
@@ -559,7 +559,7 @@ def run():
     # FILE UPLOAD
     
     client_file = st.file_uploader(
-        "Upload Client File",
+        "**Upload Client File**",
         type=["xlsx", "xls"]
     )
     

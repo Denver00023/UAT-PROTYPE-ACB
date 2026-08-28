@@ -162,25 +162,25 @@ def run():
     with col1:
     # MAWB INPUT
         mawb_input = st.text_input(
-        "MAWB #",
+        "**MAWB #**",
         placeholder="123-45678901"
         )
 
     with col2:
         port_input = st.text_input(
-        "Port #",
+        "**Port #**",
         placeholder="EWR or ORD"
         )
 
     st.caption("Note: Please enter MAWB and Port # before uploading files. These will be used in the output filename.")
 
     client_file = st.file_uploader(
-        "Upload CLIENT EXCEL File",
+        "**Upload CLIENT EXCEL File**",
         type=["xlsx", "xls"]
     )
 
     lookup_file = st.file_uploader(
-        "Upload VENDOR MASTERFILE LOOKUP",
+        "**Upload VENDOR MASTERFILE LOOKUP**",
         type=["xlsx", "xls"]
     )
 
