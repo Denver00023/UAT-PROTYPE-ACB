@@ -177,8 +177,12 @@ def show_success_popup(title, message, backup_file=None):
         if backup_file:
 
             st.info(
-                f"Backup created: {backup_file.name}"
+                f"📦 Backup created: {backup_file.name}"
             )
+
+        st.write(
+            "The database has been updated successfully."
+        )
 
         if st.button(
             "OK",
@@ -383,8 +387,6 @@ def run():
                     backup
                 )
 
-                st.rerun()
-
             except Exception as e:
 
                 st.error(
@@ -474,8 +476,6 @@ def run():
                     backup
                 )
 
-                st.rerun()
-
             except Exception as e:
 
                 st.error(
@@ -551,14 +551,12 @@ def run():
                     backup
                 )
 
-                st.rerun()
 
             except Exception as e:
 
                 st.error(
                     f"Unable to delete record: {e}"
                 )
-
 
 # RUN
 
