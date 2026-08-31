@@ -78,69 +78,117 @@ def create_backup():
 
 def save_sheet(sheet_name, df):
 
-    # Create backup BEFORE modifying database
+
+    # CREATE BACKUP BEFORE MODIFYING DATABASE
+
     backup_file = create_backup()
 
-    # Load existing workbook
-    workbook = load_workbook(
-        DATABASE_FILE
-    )
-
-    # Get worksheet
-    worksheet = workbook[sheet_name]
-
-    # DELETE EXISTING DATA
-    
-    worksheet.delete_rows(
-        1,
-        worksheet.max_row
-    )
-
-    # WRITE COLUMN HEADERS
-    
-    for column_number, column_name in enumerate(
-        df.columns,
-        start=1
-    ):
-
-        worksheet.cell(
-            row=1,
-            column=column_number,
-            value=column_name
+    try:
+        
+        # LOAD EXISTING WORKBOOK
+        
+        workbook = load_workbook(
+            DATABASE_FILE
         )
 
-    # WRITE DATA
-    
-    for row_number, row in enumerate(
-        df.itertuples(index=False),
-        start=2
-    ):
+        # CHECK SHEET
+        
+        if sheet_name not in workbook.sheetnames:
 
-        for column_number, value in enumerate(
-            row,
+            raise ValueError(
+                f"Sheet '{sheet_name}' does not exist."
+            )
+
+        worksheet = workbook[sheet_name]
+
+        
+        # DELETE EXISTING DATA
+        
+        if worksheet.max_row > 0:
+
+            worksheet.delete_rows(
+                1,
+                worksheet.max_row
+            )
+
+        
+        # WRITE COLUMN HEADERS
+        
+        for column_number, column_name in enumerate(
+            df.columns,
             start=1
         ):
 
-            if pd.isna(value):
-                value = ""
-
             worksheet.cell(
-                row=row_number,
+                row=1,
                 column=column_number,
-                value=str(value)
+                value=column_name
             )
 
-    # SAVE WORKBOOK
-    
-    workbook.save(
-        DATABASE_FILE
-    )
+        
+        # WRITE DATA
 
-    # Clear cached Excel data
-    st.cache_data.clear()
-    st.rerun()
+        for row_number, row in enumerate(
+            df.itertuples(index=False),
+            start=2
+        ):
 
-    return backup_file
+            for column_number, value in enumerate(
+                row,
+                start=1
+            ):
+
+                if pd.isna(value):
+
+                    value = ""
+
+                worksheet.cell(
+                    row=row_number,
+                    column=column_number,
+                    value=str(value)
+                )
+
+        # SAVE DATABASE
+        workbook.save(
+            DATABASE_FILE
+        )
+
+        # CLEAR CACHE
+        st.cache_data.clear()
+
+        return backup_file
+
+    except PermissionError:
+
+        raise PermissionError(
+            "database.xlsx is locked or you do not have "
+            "permission to modify it. "
+            "Please close the Excel file and try again."
+        )
+
+# SUCCESS POPUP / MODAL
+def show_success_popup(title, message, backup_file=None):
+
+    @st.dialog(title)
+    def popup():
+
+        st.success(message)
+
+        if backup_file:
+
+            st.info(
+                f"Backup created: {backup_file.name}"
+            )
+
+        if st.button(
+            "OK",
+            type="primary",
+            use_container_width=True
+        ):
+
+            st.rerun()
+
+    popup()
 
 # MAIN APP
 
@@ -199,7 +247,6 @@ def run():
 
     # SHOW DATABASE SHEETS
     
-
     st.write(
         "### 📚 Database Sheets"
     )
@@ -330,13 +377,10 @@ def run():
                     updated_df
                 )
 
-                st.success(
-                    "✅ Record added successfully!"
-                )
-
-                st.info(
-                    f"Backup created: "
-                    f"{backup.name}"
+                show_success_popup(
+                    "✅ Record Added",
+                    f"Record successfully added to '{selected_sheet}'.",
+                    backup
                 )
 
                 st.rerun()
@@ -424,13 +468,10 @@ def run():
                     updated_df
                 )
 
-                st.success(
-                    "✅ Record updated successfully!"
-                )
-
-                st.info(
-                    f"Backup created: "
-                    f"{backup.name}"
+                show_success_popup(
+                    "✅ Record Updated",
+                    f"Record successfully updated in '{selected_sheet}'.",
+                    backup
                 )
 
                 st.rerun()
@@ -504,13 +545,10 @@ def run():
                     updated_df
                 )
 
-                st.success(
-                    "✅ Record deleted successfully!"
-                )
-
-                st.info(
-                    f"Backup created: "
-                    f"{backup.name}"
+                show_success_popup(
+                    "🗑️ Record Deleted",
+                    f"Record successfully deleted from '{selected_sheet}'.",
+                    backup
                 )
 
                 st.rerun()
