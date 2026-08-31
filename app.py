@@ -32,7 +32,8 @@ from modules import (
     ezclear,
     spliptpdf,
     compresspdf,
-    hr_payroll,
+    #hr_payroll,
+    hscode,
 
     #OTHER MODULES  
     #test_sharepoint,
@@ -97,7 +98,8 @@ NAV_GROUPS = {
         "📑 Split PDF": "SPLIT_PDF",
         "📦 Compress PDF": "compresspdf",
         "📊 EZCLEAR": "ezclear",
-        "💰 HR PAYROLL": "hr_payroll",
+        #"💰 HR PAYROLL": "hr_payroll",
+        "🔎 HSCODE SEARCH": "hscode",
     }
 }
 
@@ -152,8 +154,8 @@ MODULES = {
     "SPLIT_PDF": spliptpdf.run,
     "ezclear": ezclear.run,
     "compresspdf": compresspdf.run,
-    "hr_payroll": hr_payroll.run,
-
+    #"hr_payroll": hr_payroll.run,
+    "hscode": hscode.run,
     #"excelmerger": excelmerger.run,
     #"gst": gst.run,
     #"candata_to_gets_format": candata_to_gets_format.run,
