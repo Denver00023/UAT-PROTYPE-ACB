@@ -152,7 +152,7 @@ def build_row(header, item, mapping_dict, hs_mapping, mawb_number, program_scope
         
         # ---------------- PRODUCT ----------------
         "Product_code": item.get("asin", ""),
-        "AMAZON_FNSKU": item.get("itemID", ""),
+        "AMAZON_FNSKU": item.get("itemID", ""), # Purpose on this line was reported by requested Sidreck Nisay
         "Currency_code": item.get("currency", ""),
         "Package_no": item.get("quantity", ""),
         "Quantity": item.get("quantity", ""),
@@ -248,7 +248,31 @@ def create_aior_sior_excel(df):
         .str.contains("A-IOR", na=False)
     ].copy()
 
+    # WHOLE = all records
+    whole_df = df.copy()
+
     with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
+
+        # ---------------- WHOLE ----------------
+        whole_df.to_excel(
+            writer,
+            sheet_name="CANDATA_AMAZON_B2B",
+            index=False
+        )
+
+        whole_worksheet = writer.sheets["CANDATA_AMAZON_B2B"]
+
+        for i, col in enumerate(whole_df.columns):
+            max_len = max(
+                whole_df[col].astype(str).map(len).max()
+                if not whole_df.empty else 0,
+                len(col)
+            )
+            whole_worksheet.set_column(
+                i,
+                i,
+                max_len + 5
+            )
 
         # ---------------- SIOR ----------------
         sior_df.to_excel(
@@ -265,7 +289,11 @@ def create_aior_sior_excel(df):
                 if not sior_df.empty else 0,
                 len(col)
             )
-            sior_worksheet.set_column(i, i, max_len + 5)
+            sior_worksheet.set_column(
+                i,
+                i,
+                max_len + 5
+            )
 
         # ---------------- AIOR ----------------
         aior_df.to_excel(
@@ -282,11 +310,16 @@ def create_aior_sior_excel(df):
                 if not aior_df.empty else 0,
                 len(col)
             )
-            aior_worksheet.set_column(i, i, max_len + 5)
+            aior_worksheet.set_column(
+                i,
+                i,
+                max_len + 5
+            )
 
     output.seek(0)
 
     return output
+
 
 # CREATE SELLER FILES ZIP
 def create_seller_files_zip(df):
@@ -374,11 +407,14 @@ def create_seller_files_zip(df):
 
     return zip_output
 
-def extract_bol_mapping(root):
+def extract_bol_mapping(root, bol_filename):
     """
     Returns:
         {
-            loadNumber: billOfLadingNumber
+            loadNumber: {
+                "bill_number": billOfLadingNumber,
+                "file_name": BOL XML filename
+            }
         }
     """
 
@@ -394,8 +430,12 @@ def extract_bol_mapping(root):
         return {}
 
     return {
-        load_number: bill_number
+        load_number: {
+            "bill_number": bill_number,
+            "file_name": bol_filename
+        }
     }
+
 
 # STREAMLIT APP
 def run():
@@ -482,7 +522,7 @@ def run():
                 "uom": str(row.get("UOM", "")).strip().upper()
             }
     
-    #BOL Mapping
+    # BOL Mapping
     bol_mapping = {}
 
     if bol_files:
@@ -494,12 +534,17 @@ def run():
                 root = tree.getroot()
 
                 bol_mapping.update(
-                    extract_bol_mapping(root)
+                    extract_bol_mapping(
+                        root,
+                        bol_file.name
+                    )
                 )
 
             except Exception as e:
-                st.error(f"BOL XML Error: {bol_file.name} - {e}")    
-    
+                st.error(
+                    f"BOL XML Error: {bol_file.name} - {e}"
+                )  
+        
     # LOAD MAPPING
     mapping_dict = {}
 
@@ -532,12 +577,16 @@ def run():
                 #BOL Mapping Validation
                 tracking_id = header.get("trackingID", "").strip()
 
-                mawb_number = bol_mapping.get(tracking_id, "")
+                bol_info = bol_mapping.get(tracking_id, {})
+
+                mawb_number = bol_info.get("bill_number", "")
+                bol_filename = bol_info.get("file_name", "")
 
                 if not mawb_number:
                     missing_bol.append({
                         "Tracking ID": tracking_id,
-                        "File": uploaded_file.name
+                        "CI - XML File Name": uploaded_file.name,
+                        "BOL - XML File Name": bol_filename
                     })
 
                 # Merchant ID Mapping Validation
