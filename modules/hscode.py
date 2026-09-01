@@ -343,7 +343,7 @@ def run():
 
     
     # ADD RECORD
-    
+
     elif action == "➕ Add Record":
 
         st.subheader(
@@ -353,6 +353,7 @@ def run():
         new_values = {}
 
         # Create input for every column
+
         for column in df.columns:
 
             new_values[column] = st.text_input(
@@ -360,38 +361,104 @@ def run():
                 key=f"add_{selected_sheet}_{column}"
             )
 
+        st.divider()
+
+        # PREVIEW NEW RECORD
+
+        st.write(
+            "### 👀 New Record Preview"
+        )
+
+        preview_df = pd.DataFrame(
+            [new_values]
+        )
+
+        st.dataframe(
+            preview_df,
+            use_container_width=True,
+            hide_index=True
+        )
+
         if st.button(
             "💾 Add Record",
-            type="primary"
+            type="primary",
+            use_container_width=True
         ):
+
+            # CHECK IF ALL FIELDS ARE EMPTY
+
+            if all(
+                not str(value).strip()
+                for value in new_values.values()
+            ):
+
+                st.warning(
+                    "⚠️ Please enter at least one value "
+                    "before adding the record."
+                )
+
+                return
+
+            # CREATE NEW ROW
 
             new_row = pd.DataFrame(
                 [new_values]
             )
 
-            updated_df = pd.concat(
-                [df, new_row],
-                ignore_index=True
-            )
+            # CHECK FOR EXACT DUPLICATE
 
-            try:
+            duplicate_found = False
 
-                backup = save_sheet(
-                    selected_sheet,
-                    updated_df
+            if not df.empty:
+
+                comparison_df = df.fillna("").astype(str)
+                comparison_row = new_row.fillna("").astype(str)
+
+                duplicate_found = (
+                    comparison_df.eq(
+                        comparison_row.iloc[0]
+                    ).all(axis=1).any()
                 )
 
-                show_success_popup(
-                    "✅ Record Added",
-                    f"Record successfully added to '{selected_sheet}'.",
-                    backup
+            if duplicate_found:
+
+                st.warning(
+                    "⚠️ This exact record already exists "
+                    "in the database."
                 )
 
-            except Exception as e:
-
-                st.error(
-                    f"Unable to save record: {e}"
+                st.info(
+                    "No changes were made to the database."
                 )
+
+            else:
+
+                updated_df = pd.concat(
+                    [df, new_row],
+                    ignore_index=True
+                )
+
+                try:
+
+                    backup = save_sheet(
+                        selected_sheet,
+                        updated_df
+                    )
+
+                    show_success_popup(
+                        "✅ Record Added",
+                        (
+                            f"Record successfully added "
+                            f"to '{selected_sheet}'."
+                        ),
+                        backup
+                    )
+
+                except Exception as e:
+
+                    st.error(
+                        f"Unable to save record: {e}"
+                    )
 
     
     # EDIT RECORD
@@ -410,33 +477,130 @@ def run():
 
             return
 
-        # Select row
-        row_number = st.number_input(
-            "Row number to edit",
-            min_value=1,
-            max_value=len(df),
-            value=1,
-            step=1
+        # SEARCH RECORD TO EDIT
+
+        edit_search = st.text_input(
+            "🔎 Search record to edit",
+            placeholder=(
+                "Search HS Code, product, airline, "
+                "carrier, destination, code, etc."
+            ),
+            key=f"edit_search_{selected_sheet}"
         )
 
-        row_index = int(
-            row_number - 1
+        # Find matching records
+
+        matching_df = search_data(
+            df,
+            edit_search
+        )
+
+        if edit_search.strip():
+
+            st.write(
+                f"### 🔍 Found "
+                f"{len(matching_df):,} matching record(s)"
+            )
+
+        else:
+
+            st.write(
+                "### 📋 Select a record to edit"
+            )
+
+        if matching_df.empty:
+
+            if edit_search.strip():
+
+                st.warning(
+                    "No matching records found."
+                )
+
+            return
+
+        # Create readable record options
+
+        record_options = []
+
+        for index in matching_df.index:
+
+            row = matching_df.loc[index]
+
+            # Create description from all available fields
+
+            values = []
+
+            for column in df.columns:
+
+                value = str(row[column])
+
+                if value and value.lower() != "nan":
+
+                    values.append(
+                        f"{column}: {value}"
+                    )
+
+            description = " | ".join(values)
+
+            record_options.append(
+                (index, description)
+            )
+
+        # Select record
+
+        selected_record = st.selectbox(
+            "Select the record you want to edit",
+            record_options,
+            format_func=lambda x: x[1],
+            key=f"edit_record_{selected_sheet}"
+        )
+
+        row_index = selected_record[0]
+
+        st.divider()
+
+        st.write(
+            f"### ✏️ Editing Record #{row_index + 1}"
+        )
+
+        # Show original record
+
+        st.write(
+            "#### Current Record"
+        )
+
+        st.dataframe(
+            df.loc[
+                [row_index]
+            ],
+            use_container_width=True,
+            hide_index=True
         )
 
         st.write(
-            f"Editing Excel data row "
-            f"**{row_number}**"
+            "#### ✏️ Edit Information"
         )
 
         edited_values = {}
 
         for column in df.columns:
 
-            current_value = str(
-                df.iloc[
-                    row_index
-                ][column]
-            )
+            current_value = df.loc[
+                row_index,
+                column
+            ]
+
+            # Handle empty / NaN values
+
+            if pd.isna(current_value):
+
+                current_value = ""
+
+            else:
+
+                current_value = str(
+                    current_value
+                )
 
             edited_values[column] = st.text_input(
                 column,
@@ -449,9 +613,14 @@ def run():
                 )
             )
 
+        st.divider()
+
+        # SAVE CHANGES
+
         if st.button(
             "💾 Save Changes",
-            type="primary"
+            type="primary",
+            use_container_width=True
         ):
 
             updated_df = df.copy()
@@ -472,7 +641,10 @@ def run():
 
                 show_success_popup(
                     "✅ Record Updated",
-                    f"Record successfully updated in '{selected_sheet}'.",
+                    (
+                        f"Record successfully updated "
+                        f"in '{selected_sheet}'."
+                    ),
                     backup
                 )
 
