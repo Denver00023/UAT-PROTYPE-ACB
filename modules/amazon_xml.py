@@ -331,77 +331,120 @@ def create_seller_files_zip(df):
         df["Seller_name"].astype(str).str.strip() != ""
     ].copy()
 
+    # Make sure Program_Scope exists
+    if "Program_Scope" not in seller_df.columns:
+        seller_df["Program_Scope"] = ""
+
+    # Normalize Program Scope
+    seller_df["Program_Scope"] = (
+        seller_df["Program_Scope"]
+        .astype(str)
+        .str.upper()
+        .str.strip()
+    )
+
     with zipfile.ZipFile(
         zip_output,
         mode="w",
         compression=zipfile.ZIP_DEFLATED
     ) as zip_file:
 
-        # Group data by Seller_name
-        for seller_name, seller_data in seller_df.groupby(
-            "Seller_name",
+        # ------------------------------------------------
+        # GROUP BY PROGRAM SCOPE FIRST
+        # THEN GROUP BY SELLER
+        # ------------------------------------------------
+        for program_scope, program_data in seller_df.groupby(
+            "Program_Scope",
             sort=True
         ):
 
-            seller_name = str(seller_name).strip()
+            # --------------------------------------------
+            # Determine folder based on EXACT program scope
+            # --------------------------------------------
+            if "A-IOR" in program_scope:
+                folder_name = "AIOR"
 
-            # Clean invalid characters for Windows filenames
-            safe_filename = re.sub(
-                r'[<>:"/\\|?*]',
-                "_",
-                seller_name
-            )
+            elif "S-IOR" in program_scope:
+                folder_name = "SIOR"
 
-            # Prevent extremely long filenames
-            safe_filename = safe_filename[:150].strip()
+            else:
+                # Skip records that are not AIOR or SIOR
+                continue
 
-            if not safe_filename:
-                safe_filename = "Unknown_Seller"
+            # --------------------------------------------
+            # Group by Seller Name
+            # --------------------------------------------
+            for seller_name, seller_data in program_data.groupby(
+                "Seller_name",
+                sort=True
+            ):
 
-            # Create Excel file in memory
-            seller_output = BytesIO()
+                seller_name = str(seller_name).strip()
 
-            with pd.ExcelWriter(
-                seller_output,
-                engine="xlsxwriter"
-            ) as writer:
-
-                seller_data.to_excel(
-                    writer,
-                    sheet_name="CANDATA",
-                    index=False
+                # ----------------------------------------
+                # Clean invalid Windows filename characters
+                # ----------------------------------------
+                safe_filename = re.sub(
+                    r'[<>:"/\\|?*]',
+                    "_",
+                    seller_name
                 )
 
-                worksheet = writer.sheets["CANDATA"]
+                # Prevent extremely long filenames
+                safe_filename = safe_filename[:150].strip()
 
-                # Adjust column widths
-                for i, col in enumerate(seller_data.columns):
+                if not safe_filename:
+                    safe_filename = "Unknown_Seller"
 
-                    if seller_data.empty:
-                        max_len = len(col)
+                # ----------------------------------------
+                # Create Excel file in memory
+                # ----------------------------------------
+                seller_output = BytesIO()
 
-                    else:
-                        max_len = max(
-                            seller_data[col]
-                            .astype(str)
-                            .map(len)
-                            .max(),
-                            len(col)
-                        )
+                with pd.ExcelWriter(
+                    seller_output,
+                    engine="xlsxwriter"
+                ) as writer:
 
-                    worksheet.set_column(
-                        i,
-                        i,
-                        max_len + 5
+                    seller_data.to_excel(
+                        writer,
+                        sheet_name="CANDATA",
+                        index=False
                     )
 
-            seller_output.seek(0)
+                    worksheet = writer.sheets["CANDATA"]
 
-            # Add Excel file to ZIP
-            zip_file.writestr(
-                f"{safe_filename}.xlsx",
-                seller_output.getvalue()
-            )
+                    # Adjust column widths
+                    for i, col in enumerate(seller_data.columns):
+
+                        if seller_data.empty:
+                            max_len = len(col)
+
+                        else:
+                            max_len = max(
+                                seller_data[col]
+                                .astype(str)
+                                .map(len)
+                                .max(),
+                                len(col)
+                            )
+
+                        worksheet.set_column(
+                            i,
+                            i,
+                            max_len + 5
+                        )
+
+                seller_output.seek(0)
+
+                # ----------------------------------------
+                # IMPORTANT:
+                # Put Excel inside AIOR or SIOR folder
+                # ----------------------------------------
+                zip_file.writestr(
+                    f"{folder_name}/{safe_filename}.xlsx",
+                    seller_output.getvalue()
+                )
 
     zip_output.seek(0)
 
