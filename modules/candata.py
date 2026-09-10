@@ -554,7 +554,7 @@ def run():
         placeholder="0000"
         )
     
-    st.caption("“Note: Filling in these fields is optional. If you prefer not to use them, simply leave them blank. However, if you do provide values, they will be included in the final output of the Excel download file.”")
+    st.info("“Note: Filling in these fields is optional. If you prefer not to use them, simply leave them blank. However, if you do provide values, they will be included in the final output of the Excel download file.”")
     
     # FILE UPLOAD
     
@@ -563,7 +563,7 @@ def run():
         type=["xlsx", "xls"]
     )
     
-    st.caption("“Note: Please make sure the file is already cleaned and rows to process are marked as 'Y' in IID_Y/N. Rows marked as 'N' will not be included in the output. Thank you.“")
+    st.info("“Note: Please make sure the file is already cleaned and rows to process are marked as 'Y' in IID_Y/N. Rows marked as 'N' will not be included in the output. Thank you.“")
 
     st.markdown("----")
     st.caption("© 2026 ACB Toolkit | Developed by IT Department")

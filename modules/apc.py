@@ -172,7 +172,7 @@ def run():
         placeholder="EWR or ORD"
         )
 
-    st.caption("Note: Please enter MAWB and Port # before uploading files. These will be used in the output filename.")
+    st.info("Note: Please enter MAWB and Port # before uploading files. These will be used in the output filename.")
 
     client_file = st.file_uploader(
         "**Upload CLIENT EXCEL File**",

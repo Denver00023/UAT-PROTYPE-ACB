@@ -67,7 +67,7 @@ def run():
     value=default_arrival
     )
 
-    st.caption("Note: Please ensure the you already have the correct Estimated Arrival Date/Time before converting to JSON.")
+    st.info("Note: Please ensure the you already have the correct Estimated Arrival Date/Time before converting to JSON.")
 
     st.markdown("---")
     st.caption("© 2026 ACB Toolkit | Developed by IT Department")

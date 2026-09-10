@@ -198,12 +198,6 @@ def show_success_popup(title, message, backup_file=None):
 
 def run():
 
-    st.set_page_config(
-        page_title="Customs Reference Search",
-        page_icon="🔎",
-        layout="wide"
-    )
-
     st.title(
         "🔎 Customs Reference Search Engine"
     )
@@ -211,7 +205,6 @@ def run():
     st.caption(
         "Search, add, edit and delete customs reference data."
     )
-
     
     # CHECK DATABASE
     

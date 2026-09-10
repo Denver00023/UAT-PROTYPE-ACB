@@ -514,14 +514,14 @@ def run():
             type=["xlsx", "xls"]
         )
     
-    st.caption("Note: Please update your Account Setup Tracker Excel file using the latest online template before uploading. Account Setup Tracker is based on normalized seller names; minor variations may be accepted, but significant differences may cause mapping failures. Please also ensure accurate data entry. CANDATA is strict about formatting, including spaces, special characters (e.g., commas and periods), and spelling. Careful attention to these details will help prevent errors and ensure smoother processing..")
+    st.info("Note: Please update your Account Setup Tracker Excel file using the latest online template before uploading. Account Setup Tracker is based on normalized seller names; minor variations may be accepted, but significant differences may cause mapping failures. Please also ensure accurate data entry. CANDATA is strict about formatting, including spaces, special characters (e.g., commas and periods), and spelling. Careful attention to these details will help prevent errors and ensure smoother processing..")
 
     st.markdown("---")
 
     # 🔥 NEW INPUT BOXES
 
     st.subheader("⚙️ CBSA Overwrite Defaults")
-    st.caption("Optionally overwrite default CBSA values for Port of Release, Warehouse Sub Location Code, Port of Discharge, and Port of Discharge Sublocation Code. If left blank, defaults will be used in the output file.")
+    st.info("Optionally overwrite default CBSA values for Port of Release, Warehouse Sub Location Code, Port of Discharge, and Port of Discharge Sublocation Code. If left blank, defaults will be used in the output file.")
 
     col1, col2 = st.columns(2)
 

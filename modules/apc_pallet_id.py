@@ -10,10 +10,7 @@ def run():
     st.subheader("📦 APC Pallet ID Automation System")
     st.caption("Upload your Excel file and paste APC Tracking IDs to generate structured output.")
 
-    st.markdown("---")
-    st.caption("© 2026 ACB Toolkit | Developed by IT Department")
-
-
+    
     col1, col2 = st.columns(2)
 
     with col1:
@@ -136,6 +133,8 @@ def run():
         except Exception as e:
             st.error(f"Error processing file: {str(e)}")
 
-
+    st.markdown("---")
+    st.caption("© 2026 ACB Toolkit | Developed by IT Department")
+    
 if __name__ == "__main__":
     run()

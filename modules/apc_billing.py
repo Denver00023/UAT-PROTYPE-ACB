@@ -62,7 +62,7 @@ def run():
         "**MAWB #**",
         placeholder="123-45678901"
         )
-    st.caption("Note: Please enter MAWB before uploading files. These will be used in the output filename.")
+    st.info("Note: Please enter MAWB before uploading files. These will be used in the output filename.")
 
     st.markdown("---")
     st.caption("© 2026 ACB Toolkit | Developed by IT Department")
