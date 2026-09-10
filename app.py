@@ -20,6 +20,7 @@ from modules import (
     apc_client_details,
     apc_pallet_id,
     apc_candata,
+    apc_billing_validation,
 
     #DATA PROCESSING MODULES
     candata,
@@ -79,6 +80,7 @@ NAV_GROUPS = {
         "💳 APC BILLING HEADER": "APC_BILLING_HEADER",
         "📦 APC PALLET ID": "APC_PALLET_ID",
         "📊 APC CANDATA UPLOAD FILE": "APC_CANDATA",
+        "💳 APC BILLING VALIDATION": "APC_BILLING_VALIDATION"
     },
 
     "📦 AMAZON": {
@@ -148,6 +150,7 @@ MODULES = {
     "APC_BILLING_HEADER": apc_billing_header_report.run,
     "APC_PALLET_ID": apc_pallet_id.run,
     "APC_CANDATA": apc_candata.run,
+    "APC_BILLING_VALIDATION": apc_billing_validation.run,
 
     #UTILITY MODULES
     "DEFENDER": defender.run,
