@@ -152,7 +152,7 @@ def build_row(header, item, mapping_dict, hs_mapping, mawb_number, program_scope
         
         # ---------------- PRODUCT ----------------
         "Product_code": item.get("asin", ""),
-        "AMAZON_FNSKU": item.get("itemID", ""), # Purpose on this line was reported by requested Sidreck Nisay
+        #"AMAZON_FNSKU": item.get("itemID", ""), # Purpose on this line was reported by requested Sidreck Nisay
         "Currency_code": item.get("currency", ""),
         "Package_no": item.get("quantity", ""),
         "Quantity": item.get("quantity", ""),
@@ -751,7 +751,7 @@ def run():
             return round(qty / 144, 2)
 
         elif uom == "GRM":
-            return round(weight * 1000, 2)
+            return round(weight * 453.592, 2)
 
         elif uom == "KGM":
             return round(weight * 0.453592, 2)
