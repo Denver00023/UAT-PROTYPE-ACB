@@ -328,9 +328,8 @@ def create_seller_files_zip(df):
 
     seller_df = df.copy()
 
-    # ---------------------------------------------------------
+    
     # CHECK REQUIRED COLUMNS
-    # ---------------------------------------------------------
     required_columns = [
         "Program_Scope",
         "Client_Internal_tracking",
@@ -348,9 +347,8 @@ def create_seller_files_zip(df):
             f"Seller ZIP generation is missing columns: {missing_columns}"
         )
 
-    # ---------------------------------------------------------
+    
     # REMOVE BLANK SELLER
-    # ---------------------------------------------------------
     seller_df = seller_df[
         seller_df["Seller_name"]
         .fillna("")
@@ -359,9 +357,8 @@ def create_seller_files_zip(df):
         != ""
     ].copy()
 
-    # ---------------------------------------------------------
+    
     # NORMALIZE PROGRAM SCOPE
-    # ---------------------------------------------------------
     seller_df["Program_Scope"] = (
         seller_df["Program_Scope"]
         .fillna("")
@@ -370,16 +367,12 @@ def create_seller_files_zip(df):
         .str.strip()
     )
 
-    # ---------------------------------------------------------
     # EXTRACT MERCHANT ID
-    #
     # Client_Internal_tracking example:
-    #
     # 116KJKXZL-A207H0TGYJH8M
-    #
     # Result:
     # A207H0TGYJH8M
-    # ---------------------------------------------------------
+    
     def extract_merchant_id(value):
 
         value = str(value).strip()
@@ -394,9 +387,8 @@ def create_seller_files_zip(df):
         .apply(extract_merchant_id)
     )
 
-    # ---------------------------------------------------------
+    
     # CCN
-    # ---------------------------------------------------------
     seller_df["CCN"] = (
         seller_df["Reliable_tracking"]
         .fillna("")
@@ -404,9 +396,8 @@ def create_seller_files_zip(df):
         .str.strip()
     )
 
-    # ---------------------------------------------------------
     # KEEP ONLY AIOR / SIOR
-    # ---------------------------------------------------------
+    
     seller_df = seller_df[
         seller_df["Program_Scope"].isin([
             "A-IOR",
@@ -414,11 +405,8 @@ def create_seller_files_zip(df):
         ])
     ].copy()
 
-    # ---------------------------------------------------------
     # DEBUG DISPLAY
-    #
     # This lets us SEE exactly what the ZIP function is using.
-    # ---------------------------------------------------------
     st.subheader("🔍 Seller File Grouping Preview")
 
     grouping_preview = seller_df[
@@ -428,7 +416,7 @@ def create_seller_files_zip(df):
             "Client_Internal_tracking",
             "Merchant_ID",
             "Reliable_tracking",
-            "CCN"
+            
         ]
     ].drop_duplicates()
 
@@ -437,20 +425,16 @@ def create_seller_files_zip(df):
         use_container_width=True
     )
 
-    # ---------------------------------------------------------
     # GROUPING KEY
-    #
     # Program Scope + Merchant ID + CCN
-    # ---------------------------------------------------------
+    
     group_columns = [
         "Program_Scope",
         "Merchant_ID",
         "CCN"
     ]
 
-    # ---------------------------------------------------------
     # CREATE ZIP
-    # ---------------------------------------------------------
     with zipfile.ZipFile(
         zip_output,
         mode="w",
@@ -465,9 +449,7 @@ def create_seller_files_zip(df):
 
             program_scope, merchant_id, ccn = group_key
 
-            # -------------------------------------------------
             # FOLDER
-            # -------------------------------------------------
             if program_scope == "A-IOR":
                 folder_name = "AIOR"
 
@@ -477,12 +459,10 @@ def create_seller_files_zip(df):
             else:
                 continue
 
-            # -------------------------------------------------
             # SELLER NAME
-            #
             # Only used for filename.
             # NOT used for grouping.
-            # -------------------------------------------------
+            
             seller_name = (
                 group_data.iloc[0]["Seller_name"]
             )
@@ -491,9 +471,7 @@ def create_seller_files_zip(df):
                 seller_name
             ).strip()
 
-            # -------------------------------------------------
             # CLEAN SELLER NAME
-            # -------------------------------------------------
             safe_seller_name = re.sub(
                 r'[<>:"/\\|?*]',
                 "_",
@@ -508,38 +486,34 @@ def create_seller_files_zip(df):
             if not safe_seller_name:
                 safe_seller_name = "Unknown_Seller"
 
-            # -------------------------------------------------
+            
             # CLEAN MERCHANT ID
-            # -------------------------------------------------
             safe_merchant_id = re.sub(
                 r'[<>:"/\\|?*]',
                 "_",
                 str(merchant_id).strip()
             )
 
-            # -------------------------------------------------
+            
             # CLEAN CCN
-            # -------------------------------------------------
             safe_ccn = re.sub(
                 r'[<>:"/\\|?*]',
                 "_",
                 str(ccn).strip()
             )
 
-            # -------------------------------------------------
+            
             # FINAL FILE NAME
-            #
             # Seller_MerchantID_CCN.xlsx
-            # -------------------------------------------------
+            
             filename = (
                 f"{safe_seller_name}_"
                 f"{safe_merchant_id}_"
                 f"{safe_ccn}.xlsx"
             )
 
-            # -------------------------------------------------
+            
             # CREATE EXCEL
-            # -------------------------------------------------
             seller_output = BytesIO()
 
             # Remove temporary helper columns
@@ -588,9 +562,8 @@ def create_seller_files_zip(df):
 
             seller_output.seek(0)
 
-            # -------------------------------------------------
+            
             # ADD FILE TO ZIP
-            # -------------------------------------------------
             zip_file.writestr(
                 f"{folder_name}/{filename}",
                 seller_output.getvalue()
