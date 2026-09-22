@@ -136,7 +136,7 @@ def build_row(header, item, mapping_dict, hs_mapping, mawb_number, program_scope
         ),
 
         "Reliable_tracking 2": (
-        str(header.get("CCN", ""))[4:]
+            str(header.get("CCN", ""))[4:]
         ),
 
         "Client_Internal_tracking": header.get("trackingID", ""),
@@ -191,7 +191,8 @@ def build_row(header, item, mapping_dict, hs_mapping, mawb_number, program_scope
         "PGA Flag": "CFIA",
         "Category": "HVS",
         "MAWB #": mawb_number,
-        "Carrier code": "1BML",
+        "Carrier code": "1BML", 
+        "Carrier code 2": (str(header.get("CCN", ""))[:4]), 
         "Manifest Only": "",
         "Movement Type": "",
         "TARIFF_TREATMENT_CODE": "2",
