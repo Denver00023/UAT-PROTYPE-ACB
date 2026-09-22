@@ -135,6 +135,10 @@ def build_row(header, item, mapping_dict, hs_mapping, mawb_number, program_scope
             else header.get("CCN", "")
         ),
 
+        "Reliable_tracking 2": (
+        str(header.get("CCN", ""))[4:]
+        ),
+
         "Client_Internal_tracking": header.get("trackingID", ""),
         
         # ---------------- PACKAGE / ITEM ----------------
