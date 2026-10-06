@@ -902,7 +902,8 @@ def run():
             return round(weight * 453.592, 2)
 
         elif uom == "KGM":
-            return round(weight * 0.453592, 2)
+            return max(round(weight * 0.453592, 2), 0.001) #New Version
+            #return round(weight * 0.453592, 2)
 
         elif uom == "TNE":
             return max(round((weight * 0.453592) / 1000, 2), 0.01)
