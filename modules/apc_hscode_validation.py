@@ -623,7 +623,7 @@ def run():
                     shipment_df = pd.read_excel(
                         second_file,
                         dtype=str,
-                        skiprows=[1]
+                        
                     )
 
                     shipment_df.columns = (
