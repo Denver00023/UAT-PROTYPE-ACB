@@ -22,7 +22,7 @@ def clean_value(value):
     return value
 
 
-# Normalize descriptions for client-file matching.
+# Normalize descriptions for text comparison if needed.
 def normalize_description(value):
 
     value = clean_value(value)
@@ -34,30 +34,16 @@ def normalize_description(value):
     return value
 
 
-# Collect Client_HS_code from the third file.
+# Collect Client_HS_code from the third file with flexible multi-field matching.
 def add_client_hs_code(
     shipment_df,
     client_df
 ):
 
-    required_shipment_columns = [
-        "Client_Internal_tracking",
-        "Goods_Description"
-    ]
-
     required_client_columns = [
         "Reliable_tracking",
-        "Goods_Description",
         "HS_code"
     ]
-
-    for column in required_shipment_columns:
-
-        if column not in shipment_df.columns:
-
-            raise ValueError(
-                f"Second file must contain: {column}"
-            )
 
     for column in required_client_columns:
 
@@ -69,74 +55,136 @@ def add_client_hs_code(
 
     result_df = shipment_df.copy()
 
-    client_hs_lookup = {}
+    # Build multi-level lookup dictionaries from the client file
+    client_hs_lookup_tracking = {}
+    client_hs_lookup_order = {}
+
+    has_client_order = "Order_number" in client_df.columns
 
     for _, row in client_df.iterrows():
 
-        reliable_tracking = clean_value(
+        tracking_num = clean_value(
             row["Reliable_tracking"]
         )
 
-        goods_description = normalize_description(
-            row["Goods_Description"]
+        order_num = (
+            clean_value(row["Order_number"])
+            if has_client_order
+            else ""
         )
 
         client_hs = clean_value(
             row["HS_code"]
         )
 
-        if not reliable_tracking:
-            continue
-
-        if not goods_description:
-            continue
-
         if not client_hs:
             continue
 
-        lookup_key = (
-            reliable_tracking,
-            goods_description
-        )
+        if tracking_num:
+            client_hs_lookup_tracking[
+                tracking_num
+            ] = client_hs
 
-        client_hs_lookup[lookup_key] = client_hs
+        if order_num:
+            client_hs_lookup_order[
+                order_num
+            ] = client_hs
 
     result_df["Client_HS_code"] = ""
-
     result_df["_Client_HS_Status"] = (
         "No Client Match"
     )
 
+    # Identify tracking column in shipment file
+    possible_tracking_columns = [
+        "Client_Internal_tracking",
+        "Tracking",
+        "Tracking_Number",
+        "Shipment_ID",
+        "AWB"
+    ]
+
+    shipment_tracking_col = None
+
+    for col in possible_tracking_columns:
+
+        if col in result_df.columns:
+
+            shipment_tracking_col = col
+
+            break
+
+    has_shipment_order = (
+        "Order_number" in result_df.columns
+    )
+
     for index, row in result_df.iterrows():
 
-        internal_tracking = clean_value(
-            row["Client_Internal_tracking"]
-        )
+        matched_hs = ""
+        match_status = "No Client Match"
 
-        goods_description = normalize_description(
-            row["Goods_Description"]
-        )
+        # 1. Try matching by tracking number
+        if shipment_tracking_col:
 
-        lookup_key = (
-            internal_tracking,
-            goods_description
-        )
+            tracking_val = clean_value(
+                row[shipment_tracking_col]
+            )
 
-        if lookup_key in client_hs_lookup:
+            if (
+                tracking_val
+                in client_hs_lookup_tracking
+            ):
 
-            client_hs = client_hs_lookup[
-                lookup_key
-            ]
+                matched_hs = (
+                    client_hs_lookup_tracking[
+                        tracking_val
+                    ]
+                )
+
+                match_status = "Matched (Tracking)"
+
+        # 2. Fallback: Try matching by Order Number if tracking failed
+        if not matched_hs and has_shipment_order:
+
+            order_val = clean_value(
+                row["Order_number"]
+            )
+
+            if order_val in client_hs_lookup_order:
+
+                matched_hs = (
+                    client_hs_lookup_order[
+                        order_val
+                    ]
+                )
+
+                match_status = (
+                    "Matched (Order Number)"
+                )
+
+        if matched_hs:
 
             result_df.at[
                 index,
                 "Client_HS_code"
-            ] = client_hs
+            ] = matched_hs
 
             result_df.at[
                 index,
                 "_Client_HS_Status"
-            ] = "Matched"
+            ] = match_status
+
+        else:
+
+            result_df.at[
+                index,
+                "Client_HS_code"
+            ] = ""
+
+            result_df.at[
+                index,
+                "_Client_HS_Status"
+            ] = "No Client Match"
 
     return result_df
 
@@ -504,22 +552,15 @@ def run():
         **Second File — Shipment File**
 
         `HS_code` = Original shipment HS code  
-        `Client_Internal_tracking` = Tracking used for client matching
+        `Client_Internal_tracking` / `Order_number` = Used for client matching
 
         **Third File — Client File**
 
-        `Reliable_tracking` = Client tracking number  
-        `Goods_Description` = Product description  
+        `Reliable_tracking` / `Order_number` = Client tracking / order number  
         `HS_code` = Client HS code
 
-        The Client HS code is collected from the Third File
+        The Client HS code is collected first using tracking/order matching
         and then looked up in the First File Master.
-
-        If the Client HS code is found in the Master,
-        its `Adjusted_HS_code` becomes the final `HS_code`.
-
-        If the Client HS code is not found in the Master,
-        the original shipment `HS_code` remains unchanged.
         """
     )
 
@@ -622,8 +663,7 @@ def run():
 
                     shipment_df = pd.read_excel(
                         second_file,
-                        dtype=str,
-                        
+                        dtype=str
                     )
 
                     shipment_df.columns = (
@@ -691,7 +731,7 @@ def run():
                         result_df[
                             "_Client_HS_Status"
                         ]
-                        == "Matched"
+                        .str.startswith("Matched")
                     ).sum()
                 )
 
@@ -871,12 +911,12 @@ def run():
                         result_df[
                             "_Client_HS_Status"
                         ]
-                        == "Matched"
+                        .str.startswith("Matched")
                     ][
                         [
                             "Client_Internal_tracking",
-                            "Goods_Description",
-                            "Client_HS_code"
+                            "Client_HS_code",
+                            "_Client_HS_Status"
                         ]
                     ].copy()
 
