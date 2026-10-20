@@ -10,6 +10,7 @@ from modules import (
 
     #AMAZON MODULES
     amazon_xml,
+    amazon_aior_upload,
     amazon_aci_json,
     #amazon_xml_gets,
 
@@ -166,6 +167,7 @@ NAV_GROUPS = {
 
     "📦 AMAZON": {
         "📊 AMAZON XML TO CANDATA": "AMAZON_XML",
+        "📦 AMAZON AIOR UPLOAD": "AMAZON_AIOR_UPLOAD",
         "📦 AMAZON ACI JSON": "AMAZON_ACI_JSON",
     },
     
@@ -216,6 +218,7 @@ MODULES = {
     #AMAZON MODULES
     "AMAZON_XML": amazon_xml.run,
     "AMAZON_ACI_JSON": amazon_aci_json.run,
+    "AMAZON_AIOR_UPLOAD": amazon_aior_upload.run,
     #"AMAZON_XML_GETS": amazon_xml_gets.run,
 
     #DATA PROCESSING MODULES
