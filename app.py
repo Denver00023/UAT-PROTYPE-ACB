@@ -36,6 +36,10 @@ from modules import (
     spliptpdf,
     compresspdf,
     hscode,
+    
+    #FINANCIAL & ACCOUNTING MODULES
+    pcv,
+    ca,
 
     #OTHER MODULES  
     #hr_payroll,
@@ -185,6 +189,11 @@ NAV_GROUPS = {
         "📊 EZCLEAR": "ezclear",
         "🔎 HSCODE SEARCH": "hscode",
         #"💰 HR PAYROLL": "hr_payroll",
+    },
+    
+    "💰 Financial & Accounting": {
+        "💸 PETTY CASH VOUCHER": "pcv",
+        "💸 CASH ADVANCE": "ca",
     }
 }
 
@@ -243,6 +252,8 @@ MODULES = {
     "ezclear": ezclear.run,
     "compresspdf": compresspdf.run,
     "hscode": hscode.run,
+    "pcv": pcv.run,
+    "ca": ca.run,
     #"hr_payroll": hr_payroll.run,
     #"excelmerger": excelmerger.run,
     #"gst": gst.run,

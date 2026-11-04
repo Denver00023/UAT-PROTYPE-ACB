@@ -23,7 +23,11 @@ def run():
         "Duty Rate",
         "Duty",
         "Value for Tax",
-        "Gov. Sales Tax",
+        "GST",
+        "HST",
+        "PST",
+        "SIMA",
+        "Surtax",
         "Inco Terms",
         "CCN"
     ]
@@ -32,7 +36,7 @@ def run():
 
     with col1:
         gets_file = st.file_uploader(
-            "**Upload GETS Upload File**",
+            "Upload GETS Upload File",
             type=["xlsx", "csv"]
         )
         client_value = st.text_input("CLIENT", placeholder="Client Name")
@@ -40,7 +44,7 @@ def run():
 
     with col2:
         sftp_file = st.file_uploader(
-            "**Upload SFTP File**",
+            "Upload SFTP File",
             type=["xlsx", "csv"]
         )
         rpt_date_value = st.text_input("RPT DATE", value=pd.Timestamp.now().strftime("%m/%d/%Y"))
@@ -73,6 +77,16 @@ def run():
 
             gets_df = load_file(gets_file).fillna("")
 
+            # Clean column headers first
+            gets_df.columns = gets_df.columns.str.strip()
+
+            # Rename old column to new column
+            gets_df.rename(
+                columns={
+                    "Gov. Sales Tax": "GST"
+                },
+                inplace=True
+            )
             # SFTP data starts from row 3
             sftp_df = load_file(
                 sftp_file,
@@ -140,7 +154,11 @@ def run():
                 "Duty Rate":0,
                 "Duty":0,
                 "Value for Tax":0,
-                "Gov. Sales Tax":0,
+                "GST": 0,
+                "HST": 0,
+                "PST": 0,
+                "SIMA": 0,
+                "Surtax": 0,
                 "Inco Terms":new_sftp["Inco_term"],
                 "CCN":new_sftp["Reliable_raw"]
             })
@@ -152,7 +170,11 @@ def run():
                 "Duty Rate": 0,
                 "Duty": 0,
                 "Value for Tax": 0,
-                "Gov. Sales Tax": 0
+                "GST": 0,
+                "HST": 0,
+                "PST": 0,
+                "SIMA": 0,
+                "Surtax": 0,
             }
 
             for col, value in defaults.items():
@@ -191,7 +213,11 @@ def run():
                 ],
                 ignore_index=True
             )
-
+            
+            # Ensure GETS contains all required ITEM REPORT columns
+            for col in final_columns:
+                if col not in gets_df.columns:
+                    gets_df[col] = ""
             
             st.success("Processing Complete")
 
