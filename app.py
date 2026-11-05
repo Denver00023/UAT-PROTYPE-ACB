@@ -40,6 +40,7 @@ from modules import (
     #FINANCIAL & ACCOUNTING MODULES
     pcv,
     ca,
+    liquidation,
 
     #OTHER MODULES  
     #hr_payroll,
@@ -194,6 +195,7 @@ NAV_GROUPS = {
     "💰 Financial & Accounting": {
         "💸 PETTY CASH VOUCHER": "pcv",
         "💸 CASH ADVANCE": "ca",
+        "💸 LIQUIDATION": "liquidation"
     }
 }
 
@@ -252,8 +254,11 @@ MODULES = {
     "ezclear": ezclear.run,
     "compresspdf": compresspdf.run,
     "hscode": hscode.run,
+    
+    #FINANCIAL & ACCOUNTING MODULES
     "pcv": pcv.run,
     "ca": ca.run,
+    "liquidation": liquidation.run,
     #"hr_payroll": hr_payroll.run,
     #"excelmerger": excelmerger.run,
     #"gst": gst.run,
