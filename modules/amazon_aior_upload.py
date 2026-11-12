@@ -5,9 +5,7 @@ from openpyxl.styles import Font, PatternFill
 import pandas as pd
 import streamlit as st
 
-# ============================================================
 # TARGET SCHEMA DEFINITIONS
-# ============================================================
 
 INVOICE_COLUMNS = [
     "Operation",
@@ -263,9 +261,7 @@ ITEMS_COLUMNS = [
     "TC Compliance Statement",
 ]
 
-# ============================================================
 # HELPER FUNCTIONS
-# ============================================================
 
 def normalize_header(name: str) -> str:
     return re.sub(r"[^a-z0-9]", "", str(name).lower())
@@ -292,9 +288,7 @@ def find_column(df: pd.DataFrame, candidates: list):
             return source_lookup[norm]
     return None
 
-# ============================================================
 # DATA TRANSFORMATION LOGIC
-# ============================================================
 
 def process_data(source_df: pd.DataFrame):
     inv_col = find_column(
@@ -339,7 +333,11 @@ def process_data(source_df: pd.DataFrame):
     s_postal = find_column(
         source_df, ["Seller_postal_code", "Seller postal code"]
     )
-
+    
+    # Pickup fields
+    pickup_country_col = find_column(source_df, ["Pickup_country", "Pickup country"])
+    pickup_state_col = find_column(source_df, ["Pickup_state", "Pickup state"])
+    
     # Buyer fields
     b_name = find_column(source_df, ["Buyer_name", "Buyer name"])
     b_addr = find_column(source_df, ["Buyer_address", "Buyer address"])
@@ -403,9 +401,8 @@ def process_data(source_df: pd.DataFrame):
         axis=1,
     )
 
-    # ---------------------------------------------------------
     # BUILD ITEMS SHEET
-    # ---------------------------------------------------------
+    
     items_rows = []
     for _, row in working_df.iterrows():
         item_row = {col: "" for col in ITEMS_COLUMNS}
@@ -434,9 +431,9 @@ def process_data(source_df: pd.DataFrame):
 
     items_df = pd.DataFrame(items_rows, columns=ITEMS_COLUMNS)
 
-    # ---------------------------------------------------------
+    
     # BUILD INVOICES SHEET
-    # ---------------------------------------------------------
+    
     invoices_rows = []
     invoice_groups = working_df.groupby(
         ["CleanInvoiceNo", "CleanSellerName"], sort=False, dropna=False
@@ -464,18 +461,21 @@ def process_data(source_df: pd.DataFrame):
         carrier_code_col = find_column(source_df, ["Carrier code", "Carrier_code"])
         carrier_code = get_val(first_row, carrier_code_col)
         reliable_tracking = get_val(first_row, ccn_col)
+        pickup_country_val = get_val(first_row, pickup_country_col)
+        pickup_state_val = get_val(first_row, pickup_state_col)
         ccn = f"{carrier_code}{reliable_tracking}" if (carrier_code or reliable_tracking) else get_val(first_row, order_num_col)
 
         inv_row = {col: "" for col in INVOICE_COLUMNS}
         inv_row["Operation"] = "ADD"
         inv_row["Invoice Number"] = invoice_number_mapping.get((inv_no, seller_name), "")
-        #inv_row["Exportation Country"] = country_val #Pickup State
-        inv_row["Exportation State"] = state_val
-        inv_row["Direct Shipment Country"] = country_val
-        #inv_row["Direct Shipment State"] = state_val #Pickup State
+        inv_row["Exportation Country"] = pickup_country_val #Pickup Conuntry
+        inv_row["Exportation State"] = pickup_state_val #Pickup State
+        inv_row["Direct Shipment Country"] = pickup_country_val #Pickup Conuntry
+        inv_row["Direct Shipment State"] = pickup_state_val #Pickup State
         inv_row["Invoice Total Amount"] = total_amount
         inv_row["Currency"] = "USD"
         inv_row["Invoice Quantity"] = total_qty
+        inv_row["Invoice Quantity UOM"] = "PK"
         inv_row["Weight / Volume"] = total_weight
         inv_row["Weight / Volume UOM"] = w_uom
         inv_row["Value for Duty Code"] = "13"
@@ -589,9 +589,36 @@ def build_excel_workbook(invoices_df, items_df):
 
     return output.getvalue()
 
-# ============================================================
+def validate_item_descriptions(items_df):
+    validation_rows = []
+
+    for _, row in items_df.iterrows():
+        description = row["Item Description*"]
+
+        if pd.isna(description):
+            description = ""
+        else:
+            description = str(description)
+
+        char_count = len(description)
+
+        if char_count <= 250:
+            status = "Valid"
+        elif char_count <= 256:
+            status = "Warning"
+        else:
+            status = "Error"
+
+        validation_rows.append({
+            "Invoice Number": row["Invoice Number"],
+            "Original Item Description": description,
+            "Character Count": char_count,
+            "Validation Status": status
+        })
+
+    return pd.DataFrame(validation_rows)
+
 # STREAMLIT UI APP
-# ============================================================
 
 def run():
     st.set_page_config(
@@ -622,7 +649,22 @@ def run():
 
             with st.spinner("Processing and mapping data..."):
                 invoices_result, items_result, metrics = process_data(source_df)
+                
+                # Item Description Validation
+                description_validation = validate_item_descriptions(items_result)
 
+                valid_count = (
+                    description_validation["Validation Status"] == "Valid"
+                ).sum()
+
+                warning_count = (
+                    description_validation["Validation Status"] == "Warning"
+                ).sum()
+
+                error_count = (
+                    description_validation["Validation Status"] == "Error"
+                ).sum()
+                
             # Summary Dashboard Section
             st.markdown("### 📊 Summary Dashboard")
             col1, col2, col3, col4 = st.columns(4)
@@ -645,13 +687,56 @@ def run():
                 st.success("✅ **Validation Report:** All records contain valid tracking numbers and seller names.")
 
             st.markdown("---")
-            st.subheader("📊 Preview: Invoices Sheet (Unique per Tracking + Seller)")
+            st.subheader("📊 Preview: Invoices Sheet")
             st.dataframe(invoices_result, use_container_width=True)
 
-            st.subheader("📊 Preview: Items Sheet (All Items Preserved)")
+            st.subheader("📊 Preview: Items Sheet")
             st.dataframe(items_result, use_container_width=True)
 
             excel_data = build_excel_workbook(invoices_result, items_result)
+            
+            # Items Preview + Validation Summary Side by Side
+            left_col, right_col = st.columns([3, 1])
+
+            with left_col:
+                # Validation Data Grid
+                            st.markdown("### Item Description Validation Details")
+                
+                            st.dataframe(
+                                description_validation,
+                                use_container_width=True,
+                                hide_index=True,
+                                column_config={
+                                    "Invoice Number": st.column_config.TextColumn(
+                                        "Invoice Number"
+                                    ),
+                                    "Original Item Description": st.column_config.TextColumn(
+                                        "Original Item Description",
+                                        width="large"
+                                    ),
+                                    "Character Count": st.column_config.NumberColumn(
+                                        "Character Count",
+                                        format="%d"
+                                    ),
+                                    "Validation Status": st.column_config.TextColumn(
+                                        "Validation Status"
+                                    )
+                                }
+                            )
+                            
+            with right_col:
+                st.subheader("Validation Report")
+
+                st.metric("Valid", valid_count)
+                st.metric("Warning", warning_count)
+                st.metric("Error", error_count)
+
+                if error_count > 0:
+                    st.error(f"{error_count} descriptions exceed 256 characters.")
+                elif warning_count > 0:
+                    st.warning(f"{warning_count} descriptions need review.")
+                else:
+                    st.success("All descriptions passed.")
 
             st.download_button(
                 label="⬇️ Download Final Two-Sheet Excel Workbook",
