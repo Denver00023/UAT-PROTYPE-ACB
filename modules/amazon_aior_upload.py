@@ -10,6 +10,7 @@ import streamlit as st
 INVOICE_COLUMNS = [
     "Operation",
     "Invoice Number",
+    "Purchase Order",
     "Invoice Date",
     "Exportation Country",
     "Exportation State",
@@ -66,6 +67,22 @@ INVOICE_COLUMNS = [
     "Consignee Coord Email",
     "Consignee Coord Fax",
     "Consignee Coord Phone",
+    #Shipper Details - Pickup
+    "Shipper Identifier",
+    "Shipper Name",
+    "Shipper Address",
+    "Shipper City",
+    "Shipper Postal Code",
+    "Shipper State",
+    "Shipper Country",
+    "Shipper Info Contact Name",
+    "Shipper Info Email",
+    "Shipper Info Fax",
+    "Shipper Info Phone",
+    "Shipper Coord Contact Name",
+    "Shipper Coord Email",
+    "Shipper Coord Fax",
+    "Shipper Coord Phone",    
     # Vendor
     "Vendor Identifier",
     "Vendor Name",
@@ -100,11 +117,13 @@ INVOICE_COLUMNS = [
     "External Reference 2",
     "GST CODE",
     "Container",
+    "Mode of Transport",
 ]
 
 ITEMS_COLUMNS = [
     "Operation",
     "Invoice Number",
+    "Product Code",
     "Classification No*",
     "Item Description*",
     "Tariff Treatment Code",
@@ -290,7 +309,7 @@ def find_column(df: pd.DataFrame, candidates: list):
 
 # DATA TRANSFORMATION LOGIC
 
-def process_data(source_df: pd.DataFrame):
+def process_data(source_df: pd.DataFrame, bol_override: str = ""):
     inv_col = find_column(
         source_df,
         [
@@ -304,24 +323,14 @@ def process_data(source_df: pd.DataFrame):
         inv_col = source_df.columns[0]
 
     order_num_col = find_column(source_df, ["Order_Number", "Order Number"])
-    ccn_col = find_column(
-        source_df, ["Reliable_tracking", "Reliable tracking", "CCN"]
-    )
-    total_val_col = find_column(
-        source_df, ["Total_value_of_item", "Total value of item"]
-    )
+    ccn_col = find_column(source_df, ["Reliable_tracking", "Reliable tracking", "CCN"])
+    total_val_col = find_column(source_df, ["Total_value_of_item", "Total value of item"])
     qty_col = find_column(source_df, ["Quantity"])
-    weight_col = find_column(
-        source_df, ["Parcel_item_weight", "Parcel item weight"]
-    )
-    weight_uom_col = find_column(
-        source_df, ["Parcel_item_weight_UOM", "Parcel item weight UOM"]
-    )
+    weight_col = find_column(source_df, ["Parcel_item_weight", "Parcel item weight"])
+    weight_uom_col = find_column(source_df, ["Parcel_item_weight_UOM", "Parcel item weight UOM"])
 
     qty_uom_col = find_column(source_df, ["Quantity_UOM", "Quantity UOM"])
-    converted_qty_col = find_column(
-        source_df, ["Converted_Quantity", "Converted Quantity"]
-    )
+    converted_qty_col = find_column(source_df, ["Converted_Quantity", "Converted Quantity"])
     uom_qty_col = find_column(source_df, ["UOM_Quantity", "UOM Quantity"])
 
     # Seller fields
@@ -330,9 +339,7 @@ def process_data(source_df: pd.DataFrame):
     s_name = find_column(source_df, ["Seller_name", "Seller name"])
     s_addr = find_column(source_df, ["Seller_address", "Seller address"])
     s_city = find_column(source_df, ["Seller_city", "Seller city"])
-    s_postal = find_column(
-        source_df, ["Seller_postal_code", "Seller postal code"]
-    )
+    s_postal = find_column(source_df, ["Seller_postal_code", "Seller postal code"])
     
     # Pickup fields
     pickup_country_col = find_column(source_df, ["Pickup_country", "Pickup country"])
@@ -342,24 +349,27 @@ def process_data(source_df: pd.DataFrame):
     b_name = find_column(source_df, ["Buyer_name", "Buyer name"])
     b_addr = find_column(source_df, ["Buyer_address", "Buyer address"])
     b_city = find_column(source_df, ["Buyer_city", "Buyer city"])
-    b_postal = find_column(
-        source_df, ["Buyer_postal_code", "Buyer postal code"]
-    )
+    b_postal = find_column(source_df, ["Buyer_postal_code", "Buyer postal code"])
     b_state = find_column(source_df, ["Buyer_province", "Buyer state", "State"])
     b_country = find_column(source_df, ["Buyer_country", "Buyer country"])
 
     # Item fields
     hs_col = find_column(source_df, ["HS_code", "Classification No"])
-    desc_col = find_column(
-        source_df, ["Goods_Description", "Item Description", "Description"]
-    )
-    tariff_col = find_column(
-        source_df, ["TARIFF_TREATMENT_CODE", "Tariff Treatment Code"]
-    )
+    desc_col = find_column(source_df, ["Goods_Description", "Item Description", "Description"])
+    tariff_col = find_column(source_df, ["TARIFF_TREATMENT_CODE", "Tariff Treatment Code"])
     unit_price_col = find_column(source_df, ["Unit_price", "Unit Price"])
-    origin_col = find_column(
-        source_df, ["Country_of_origin", "Country of Origin"]
-    )
+    origin_col = find_column(source_df, ["Country_of_origin", "Country of Origin"])
+    
+    # NEW COLUMN LOOKUPS TO ADD:
+    shipper_id_col = find_column(source_df, ["Shipper_Identifier", "Shipper Identifier", "Shipper_Id"])
+    pickup_name_col = find_column(source_df, ["Pickup_name", "Pickup name"])
+    pickup_addr_col = find_column(source_df, ["Pickup_address", "Pickup address"])
+    pickup_city_col = find_column(source_df, ["Pickup_city", "Pickup city"])
+    pickup_postal_col = find_column(source_df, ["Pickup_postal_code", "Pickup postal code"])
+    pickup_state_col = find_column(source_df, ["Pickup_state", "Pickup state"])
+    pickup_country_col = find_column(source_df, ["Pickup_country", "Pickup country"])
+    mode_transport_col = find_column(source_df, ["Mode_of_transport", "Mode of Transport"])
+    product_code_col = find_column(source_df, ["Product_code", "Product Code"])    
 
     working_df = source_df.copy()
 
@@ -409,6 +419,7 @@ def process_data(source_df: pd.DataFrame):
         item_row["Operation"] = "ADD"
         item_row["Invoice Number"] = row["GeneratedInvoiceNo"]
         item_row["Classification No*"] = str(row[hs_col]) if hs_col and not pd.isna(row[hs_col]) else ""
+        item_row["Product Code"] = str(row[product_code_col]) if product_code_col and not pd.isna(row[product_code_col]) else ""
         item_row["Item Description*"] = str(row[desc_col]) if desc_col and not pd.isna(row[desc_col]) else ""
         item_row["Tariff Treatment Code"] = str(row[tariff_col]) if tariff_col and not pd.isna(row[tariff_col]) else ""
         item_row["B3 Weight Quantity*"] = str(row[weight_col]) if weight_col and not pd.isna(row[weight_col]) else ""
@@ -523,9 +534,34 @@ def process_data(source_df: pd.DataFrame):
         inv_row["Vendor Info Email"] = "email@email.com"
         inv_row["Vendor Info Fax"] = "555-555-5555"
         inv_row["Vendor Info Phone"] = "555-555-5555"
-
+        
+        # UPDATE / ADD THESE MAPPINGS inside the invoices loop:
+        inv_row["Purchase Order"] = get_val(first_row, order_num_col)
+        
+        # Shipper / Pickup Details Mapping
+        p_name = get_val(first_row, pickup_name_col)
+        inv_row["Shipper Identifier"] = get_val(first_row, shipper_id_col)
+        inv_row["Shipper Name"] = p_name
+        inv_row["Shipper Address"] = get_val(first_row, pickup_addr_col)
+        inv_row["Shipper City"] = get_val(first_row, pickup_city_col)
+        inv_row["Shipper Postal Code"] = get_val(first_row, pickup_postal_col)
+        inv_row["Shipper State"] = get_val(first_row, pickup_state_col)
+        inv_row["Shipper Country"] = get_val(first_row, pickup_country_col)
+        
+        # Shipper Info Contact Defaults & Mappings
+        inv_row["Shipper Info Contact Name"] = p_name
+        inv_row["Shipper Info Email"] = "email@email.com"
+        inv_row["Shipper Info Fax"] = "555-555-5555"
+        inv_row["Shipper Info Phone"] = "555-555-555"
+        
+        # Mode of Transport Mapping
+        inv_row["Mode of Transport"] = get_val(first_row, mode_transport_col)
+        
+        #Importer Party ID Mapping
+        inv_row["Importer party id"] = "BORAMZ01"
+        
         additional_fields_mapping = {
-            "Importer party id": ["Importer_party_id", "Importer party id"],
+            #"Importer party id": ["Importer_party_id", "Importer party id"],
             "AutoCalc Provincial Rate": ["AutoCalc_Provincial_Rate", "AutoCalc Provincial Rate"],
             "CBSA Port of Release": ["CBSA_Port_of_Release", "CBSA Port of Release"],
             "CBSA Warehouse Sub Location Code": ["CBSA_Warehouse_Sub_Location_Code", "CBSA Warehouse Sub Location Code"],
@@ -552,6 +588,10 @@ def process_data(source_df: pd.DataFrame):
                     val_str = val_str.zfill(4)
                 inv_row[target_field] = val_str
 
+        # Optional UI Override: Overwrites source BOL # only if the user typed something
+        if bol_override and bol_override.strip():
+            inv_row["BOL #"] = bol_override.strip()
+            
         invoices_rows.append(inv_row)
 
     invoices_df = pd.DataFrame(invoices_rows, columns=INVOICE_COLUMNS)
@@ -626,15 +666,16 @@ def run():
         layout="wide",
     )
 
-    st.subheader("📦 Customs Invoice & Item Mapping Automation")
+    st.subheader("📦 B2B2C Customs Invoice & Item Mapping Automation")
+    
     st.info(
         "Upload your source data file to automatically transform and map it into "
         "the two-sheet template (**Invoices** & **Items**)."
     )
 
-    uploaded_file = st.file_uploader(
-        "Upload Source File (Excel or CSV)", type=["xlsx", "xls", "csv"]
-    )
+    uploaded_file = st.file_uploader("Upload Source File (Excel or CSV)", type=["xlsx", "xls", "csv"])
+    
+    BOL = st.text_input("**BOL # (Bill of Lading Number)**", placeholder="123-45678901")
 
     if uploaded_file is not None:
         try:
@@ -648,22 +689,16 @@ def run():
             )
 
             with st.spinner("Processing and mapping data..."):
-                invoices_result, items_result, metrics = process_data(source_df)
+                invoices_result, items_result, metrics = process_data(source_df, bol_override=BOL)
                 
                 # Item Description Validation
                 description_validation = validate_item_descriptions(items_result)
 
-                valid_count = (
-                    description_validation["Validation Status"] == "Valid"
-                ).sum()
+                valid_count = (description_validation["Validation Status"] == "Valid").sum()
 
-                warning_count = (
-                    description_validation["Validation Status"] == "Warning"
-                ).sum()
+                warning_count = (description_validation["Validation Status"] == "Warning").sum()
 
-                error_count = (
-                    description_validation["Validation Status"] == "Error"
-                ).sum()
+                error_count = (description_validation["Validation Status"] == "Error").sum()
                 
             # Summary Dashboard Section
             st.markdown("### 📊 Summary Dashboard")

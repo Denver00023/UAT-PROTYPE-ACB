@@ -36,6 +36,7 @@ from modules import (
     spliptpdf,
     compresspdf,
     hscode,
+    defender2,
     
     #FINANCIAL & ACCOUNTING MODULES
     pcv,
@@ -190,6 +191,7 @@ NAV_GROUPS = {
         "📦 Compress PDF": "compresspdf",
         "📊 EZCLEAR": "ezclear",
         "🔎 HSCODE SEARCH": "hscode",
+        "🛡️ DEFENDER 2": "defender2",
         #"💰 HR PAYROLL": "hr_payroll",
     },
     
@@ -256,6 +258,7 @@ MODULES = {
     "ezclear": ezclear.run,
     "compresspdf": compresspdf.run,
     "hscode": hscode.run,
+    "defender2": defender2.run,
     
     #FINANCIAL & ACCOUNTING MODULES
     "pcv": pcv.run,
