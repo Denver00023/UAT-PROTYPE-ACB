@@ -344,7 +344,13 @@ def process_data(source_df: pd.DataFrame, bol_override: str = ""):
     # Pickup fields
     pickup_country_col = find_column(source_df, ["Pickup_country", "Pickup country"])
     pickup_state_col = find_column(source_df, ["Pickup_state", "Pickup state"])
-    
+    pickup_name_col = find_column(source_df, ["Pickup_name", "Pickup name"])
+    pickup_addr_col = find_column(source_df, ["Pickup_address", "Pickup address"])
+    pickup_city_col = find_column(source_df, ["Pickup_city", "Pickup city"])
+    pickup_postal_col = find_column(source_df, ["Pickup_postal_code", "Pickup postal code"])
+    pickup_state_col = find_column(source_df, ["Pickup_state", "Pickup state"])
+    pickup_country_col = find_column(source_df, ["Pickup_country", "Pickup country"])
+        
     # Buyer fields
     b_name = find_column(source_df, ["Buyer_name", "Buyer name"])
     b_addr = find_column(source_df, ["Buyer_address", "Buyer address"])
@@ -362,12 +368,6 @@ def process_data(source_df: pd.DataFrame, bol_override: str = ""):
     
     # NEW COLUMN LOOKUPS TO ADD:
     shipper_id_col = find_column(source_df, ["Shipper_Identifier", "Shipper Identifier", "Shipper_Id"])
-    pickup_name_col = find_column(source_df, ["Pickup_name", "Pickup name"])
-    pickup_addr_col = find_column(source_df, ["Pickup_address", "Pickup address"])
-    pickup_city_col = find_column(source_df, ["Pickup_city", "Pickup city"])
-    pickup_postal_col = find_column(source_df, ["Pickup_postal_code", "Pickup postal code"])
-    pickup_state_col = find_column(source_df, ["Pickup_state", "Pickup state"])
-    pickup_country_col = find_column(source_df, ["Pickup_country", "Pickup country"])
     mode_transport_col = find_column(source_df, ["Mode_of_transport", "Mode of Transport"])
     product_code_col = find_column(source_df, ["Product_code", "Product Code"])    
 
